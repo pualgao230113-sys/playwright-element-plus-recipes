@@ -9,7 +9,7 @@
  *  2. Coordinate-based clicks (page.mouse.click(x, y)) or "the option below
  *     the input" style assumptions break when the popper flips.
  *
- * Robust: pin the viewport in playwright.config.ts (this repo uses
+ * What works: pin the viewport in playwright.config.ts (this repo uses
  * 1280x800), use locators instead of coordinates, and when placement
  * matters, assert `data-popper-placement` explicitly.
  */

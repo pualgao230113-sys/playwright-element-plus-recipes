@@ -6,13 +6,16 @@
  *     whatever fill()/type() sends. A test that fills 16 characters and then
  *     expects 16 characters fails - and a test meant to prove "the server
  *     rejects long names" can never get a long name through the UI.
- *  2. The word-limit counter is a separate element with role="status".
- *  3. The clear icon is in the DOM but `visibility: hidden` until the input
- *     is hovered (or focused). Clicking it without hovering times out.
+ *  2. The word-limit counter is a separate element (`.el-input__count`),
+ *     with role="status" since 2.14.5.
+ *  3. The clear icon cannot be clicked until the input is hovered (or
+ *     focused). Since 2.14.0 it is in the DOM with `visibility: hidden`;
+ *     before that it is not rendered at all.
  *  4. `fill('')` empties the field but does NOT emit the `clear` event, so
  *     code listening to @clear (reset filters, reload a list...) never runs.
  */
 import { expect, test } from '@playwright/test'
+import { epAtLeast } from './support/version'
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/input')
@@ -28,6 +31,7 @@ test('maxlength truncates what fill() sends', async ({ page }) => {
 })
 
 test('the word-limit counter is a status element', async ({ page }) => {
+  test.skip(!epAtLeast('2.14.5'), 'The counter got role="status" in Element Plus 2.14.5. Before that, use .el-input__count.')
   const nickname = page.getByRole('textbox', { name: 'Nickname' })
   const counter = page.locator('.el-input', { has: nickname }).getByRole('status')
 
@@ -49,11 +53,12 @@ test('the clear icon only becomes clickable on hover', async ({ page }) => {
 
   await search.fill('kiwi')
   await page.getByRole('heading', { name: 'Input', exact: true }).click() // blur, mouse away
-  // The icon exists but is invisible.
-  await expect(clearIcon).toHaveCount(1)
+  // Since 2.14.0 the icon is in the DOM but invisible. Before that it is not
+  // rendered at all until hover. Either way, a click without hovering fails.
+  await expect(clearIcon).toHaveCount(epAtLeast('2.14.0') ? 1 : 0)
   await expect(clearIcon).toBeHidden()
 
-  // Robust: hover the input first, like a user.
+  // Better: hover the input first, like a user.
   await search.hover()
   await clearIcon.click()
   await expect(search).toHaveValue('')

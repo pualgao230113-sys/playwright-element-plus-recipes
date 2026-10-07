@@ -41,7 +41,7 @@ test('a closed dialog is hidden, not removed', async ({ page }) => {
 
   // Naive: expect(page.locator('.el-dialog')).toHaveCount(0) -> fails forever.
   await expect(page.locator('.el-dialog')).toHaveCount(1)
-  // Robust: assert visibility. Role queries skip hidden elements, so this works too.
+  // Better: assert visibility. Role queries skip hidden elements, so this works too.
   await expect(dialog).toBeHidden()
   await expect(page.getByRole('dialog')).toHaveCount(0)
 })

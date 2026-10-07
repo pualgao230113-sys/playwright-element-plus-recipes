@@ -14,6 +14,7 @@
  *  4. Clicking the header cell cycles ascending -> descending -> none, but
  *     the "Sort by X" caret button does NOT: a plain click() hits its lower
  *     (descending) caret. Assert the header's `aria-sort` after every click.
+ *     The button and `aria-sort` exist since 2.13.0.
  *
  * Note: older Element UI / early Element Plus rendered fixed columns as a
  * second, overlapping table (every fixed cell existed twice). Current
@@ -22,6 +23,7 @@
  */
 import { expect, test } from '@playwright/test'
 import { columnTexts, rowByCell, tableRows, waitForTable } from './helpers/element-plus'
+import { epAtLeast } from './support/version'
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/table')
@@ -34,7 +36,7 @@ test('the empty text is visible while the table is still loading', async ({ page
   await expect(table.getByText('No books match')).toBeVisible()
   await expect(table.locator('.el-loading-mask')).toBeVisible()
 
-  // Robust: wait for the loading mask to go, THEN judge rows / empty state.
+  // Better: wait for the loading mask to go, THEN judge rows / empty state.
   await waitForTable(table)
   await expect(tableRows(table)).toHaveCount(5)
   await expect(table.getByText('No books match')).toBeHidden()
@@ -46,7 +48,7 @@ test('count body rows, not every role="row"', async ({ page }) => {
 
   // Naive: getByRole('row') includes the header row from the header table.
   await expect(table.getByRole('row')).toHaveCount(6)
-  // Robust: body rows only.
+  // Better: body rows only.
   await expect(tableRows(table)).toHaveCount(5)
   expect(await table.locator('table').count()).toBe(2)
 })
@@ -67,6 +69,7 @@ test('find a row by a cell value, then act inside that row', async ({ page }) =>
 })
 
 test('sorting: the "Sort by" button is not a cycle button', async ({ page }) => {
+  test.skip(!epAtLeast('2.13.0'), 'The "Sort by" button and aria-sort were added in Element Plus 2.13.0.')
   const table = page.getByTestId('books-table')
   await waitForTable(table)
   const yearHeader = table.locator('th.col-year')
@@ -81,6 +84,7 @@ test('sorting: the "Sort by" button is not a cycle button', async ({ page }) => 
 })
 
 test('sorting: click the header cell to cycle, or a caret to set', async ({ page }) => {
+  test.skip(!epAtLeast('2.13.0'), 'aria-sort on header cells was added in Element Plus 2.13.0.')
   const table = page.getByTestId('books-table')
   await waitForTable(table)
   const yearHeader = table.locator('th.col-year')

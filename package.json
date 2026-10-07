@@ -2,26 +2,61 @@
   "name": "playwright-element-plus-recipes",
   "version": "0.1.0",
   "private": true,
-  "description": "Pitfall -> why -> robust pattern recipes for testing Element Plus (Vue 3) apps with Playwright.",
+  "description": "Playwright recipes and helpers for testing Element Plus (Vue 3) apps: each pitfall reproduced in a test, with the pattern that avoids it.",
   "license": "MIT",
   "author": "Paul Gao",
+  "homepage": "https://github.com/pualgao230113-sys/playwright-element-plus-recipes#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pualgao230113-sys/playwright-element-plus-recipes.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pualgao230113-sys/playwright-element-plus-recipes/issues"
+  },
   "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist-helpers/esm/element-plus.d.ts",
+        "default": "./dist-helpers/esm/element-plus.js"
+      },
+      "require": {
+        "types": "./dist-helpers/cjs/element-plus.d.ts",
+        "default": "./dist-helpers/cjs/element-plus.js"
+      }
+    }
+  },
+  "main": "./dist-helpers/cjs/element-plus.js",
+  "types": "./dist-helpers/esm/element-plus.d.ts",
+  "files": [
+    "dist-helpers",
+    "tests/helpers",
+    "docs/helpers.md"
+  ],
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "scripts": {
     "dev": "vite --port 5179 --strictPort",
     "build": "vite build",
+    "build:helpers": "node scripts/build-helpers.mjs",
+    "prepare": "node scripts/build-helpers.mjs",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "test": "playwright test",
     "test:ui": "playwright test --ui"
   },
-  "dependencies": {
-    "element-plus": "^2.14.7",
-    "vue": "^3.5.43",
-    "vue-router": "^4.6.0"
+  "peerDependencies": {
+    "@playwright/test": ">=1.50.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
     "@types/node": "^24.0.0",
     "@vitejs/plugin-vue": "^6.0.9",
+    "element-plus": "^2.14.7",
     "typescript": "^5.9.0",
-    "vite": "^8.3.3"
+    "vite": "^8.3.3",
+    "vue": "^3.5.43",
+    "vue-router": "^4.6.0",
+    "vue-tsc": "^3.3.12"
   }
 }

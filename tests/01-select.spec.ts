@@ -4,7 +4,7 @@
  * Pitfalls:
  *  1. The dropdown is teleported to <body>. Looking for options *inside* the
  *     select finds nothing.
- *  2. Clicking the combobox <input> of a non-filterable select times out:
+ *  2. Clicking the combobox <input> of a NON-filterable select times out:
  *     the placeholder / selected label sits on top and intercepts the click.
  *  3. Options of every select stay in the DOM while closed (just hidden),
  *     and Playwright's name matching is substring by default ("Apple" also
@@ -37,7 +37,7 @@ test('options are teleported to <body>, not rendered inside the select', async (
   // Naive: scope options to the component. Finds nothing.
   await expect(root.getByRole('option')).toHaveCount(0)
 
-  // Robust: follow aria-controls from the combobox to its listbox.
+  // Better: follow aria-controls from the combobox to its listbox.
   const listbox = await openSelect(page, 'Fruit')
   await expect(listbox.getByRole('option')).toHaveCount(7)
   // The listbox really lives outside the select's subtree.
@@ -51,17 +51,28 @@ test('click the select wrapper, not the combobox input', async ({ page }) => {
   // until it times out. We prove it with a short trial click.
   await expect(combobox.click({ timeout: 1_000, trial: true })).rejects.toThrow(/intercepts pointer events/)
 
-  // Robust: click the .el-select root (what a user actually clicks).
+  // Better: click the .el-select root (what a user actually clicks).
   await selectRoot(page, 'Fruit').click()
   await expect(combobox).toHaveAttribute('aria-expanded', 'true')
+
+  // Only non-filterable selects do this: a filterable select's input is clickable.
+  await page.keyboard.press('Escape')
+  const filtered = page.getByRole('combobox', { name: 'Filtered fruit', exact: true })
+  await filtered.click()
+  await expect(filtered).toHaveAttribute('aria-expanded', 'true')
 })
 
 test('pick an option by exact name from the right listbox', async ({ page }) => {
   // Hidden options of all four selects are in the DOM right now.
   expect(await page.locator('.el-select-dropdown__item').count()).toBeGreaterThan(7)
 
-  // Naive: page.getByText('Apple') matches hidden options AND "Pineapple".
-  // Robust: role query (skips hidden elements) + exact name + scoped listbox.
+  // Naive: a default (substring) name match finds "Apple" AND "Pineapple".
+  const listbox = await openSelect(page, 'Fruit')
+  await expect(listbox.getByRole('option', { name: 'Apple' })).toHaveText(['Apple', 'Pineapple'])
+  await page.keyboard.press('Escape')
+  await expect(listbox).toBeHidden()
+
+  // Better: role query (skips hidden elements) + exact name + scoped listbox.
   await selectOption(page, 'Fruit', 'Apple')
   await expect(page.getByTestId('fruit-value')).toHaveText('Apple')
 
@@ -81,22 +92,39 @@ test('filterable select: type, then pick from the filtered list', async ({ page 
 })
 
 test('multiple select: dropdown stays open, assert tags', async ({ page }) => {
-  // Robust: pick everything, then close with Escape (the helper does both).
+  // After one pick the dropdown is still open.
+  const listbox = await openSelect(page, 'Basket')
+  await listbox.getByRole('option', { name: 'Apple', exact: true }).click()
+  await page.waitForTimeout(500) // give it a chance to close
+  await expect(listbox).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(listbox).toBeHidden()
+  await selectRoot(page, 'Basket').locator('.el-tag', { hasText: 'Apple' }).locator('.el-tag__close').click()
+  await expect(selectTags(page, 'Basket')).toHaveCount(0)
+
+  // Better: pick everything, then close with Escape (the helper does both).
   await selectOptions(page, 'Basket', ['Banana', 'Cherry', 'Mango'])
   await expect(selectTags(page, 'Basket')).toHaveText(['Banana', 'Cherry', 'Mango'])
   await expect(page.getByTestId('basket-value')).toHaveText('Banana, Cherry, Mango')
 
-  // Removing a tag uses the tag's own close button.
-  await selectRoot(page, 'Basket')
-    .locator('.el-tag', { hasText: 'Cherry' })
-    .getByRole('button', { name: 'Close this tag' })
-    .click()
+
+  // Remove a tag with its close icon. Since 2.12.0 it is also a button
+  // named "Close this tag"; the class works in every version.
+  await selectRoot(page, 'Basket').locator('.el-tag', { hasText: 'Cherry' }).locator('.el-tag__close').click()
   await expect(selectTags(page, 'Basket')).toHaveText(['Banana', 'Mango'])
 })
 
 test('remote select: wait for the option, never for a fixed time', async ({ page }) => {
+  // Before any search there are no options, and the dropdown stays hidden.
+  const input = page.getByRole('combobox', { name: 'Book', exact: true })
+  const listbox = page.locator(`[id="${await input.getAttribute('aria-controls')}"]`)
+  await selectRoot(page, 'Book').click()
+  await page.waitForTimeout(500) // asserting an absence
+  await expect(listbox).toBeHidden()
+  await page.keyboard.press('Escape')
+
   // Naive: fill + page.waitForTimeout(500) + click. Breaks as soon as the
-  // API is slower than your guess. Robust: wait for the option itself.
+  // API is slower than your guess. Better: wait for the option itself.
   await searchAndSelect(page, 'Book', 'moby', 'Moby-Dick')
   await expect(page.getByTestId('book-value')).toHaveText('Moby-Dick')
 })

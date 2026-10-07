@@ -76,7 +76,7 @@ test('switch: trust aria-checked, not toBeChecked()', async ({ page }) => {
   // Naive: toBeChecked() reads the native `checked` property, which the
   // label click left at false. It reports "unchecked" for a switch that is ON.
   await expect(reminders).not.toBeChecked()
-  // Robust: the component's real state.
+  // Better: the component's real state.
   await expect(reminders).toHaveAttribute('aria-checked', 'true')
   await expect(formItem(page, 'Email reminders').locator('.el-switch')).toHaveClass(/is-checked/)
 })
@@ -90,7 +90,7 @@ test('switch: active/inactive texts toggle, they do not set', async ({ page }) =
   await theme.getByText('Dark', { exact: true }).click()
   await expect(page.getByTestId('dark-value')).toHaveText('false')
 
-  // Robust: an idempotent helper that checks state before clicking.
+  // Better: an idempotent helper that checks state before clicking.
   await setSwitch(theme.locator('.el-switch'), true)
   await setSwitch(theme.locator('.el-switch'), true)
   await expect(page.getByTestId('dark-value')).toHaveText('true')

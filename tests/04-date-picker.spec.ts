@@ -14,12 +14,14 @@
  *  4. The calendar opens on "today", so a test that clicks day cells depends
  *     on the date it runs. Freeze the clock.
  *  5. Typed text only reaches v-model on Enter/blur, and it is parsed
- *     leniently: "3/4/2026" becomes 4 March, "31/02/2026" rolls over to
- *     3 March, while "15/3/2026" is rejected (reverts to the old value). Never assume the typed text
+ *     leniently (2.14.4+): "3/4/2026" becomes 4 March, "31/02/2026" rolls
+ *     over to 3 March, while "15/3/2026" is rejected (reverts to the old
+ *     value). Older versions reject "3/4/2026". Never assume the typed text
  *     is what got stored.
  */
 import { expect, test } from '@playwright/test'
 import { exactText, pickDay, typeDate } from './helpers/element-plus'
+import { epAtLeast } from './support/version'
 
 test.beforeEach(async ({ page }) => {
   // Freeze "now" so the calendar always opens on March 2026.
@@ -43,6 +45,7 @@ test('the model only updates when the typed value is committed', async ({ page }
 })
 
 test('typed text is parsed leniently: always assert what it became', async ({ page }) => {
+  test.skip(!epAtLeast('2.14.4'), 'Before Element Plus 2.14.4, "3/4/2026" is rejected and the field stays empty.')
   const input = page.getByRole('combobox', { name: 'Due date', exact: true })
   const commit = async (text: string) => {
     await input.fill(text)
@@ -67,6 +70,16 @@ test('typed text is parsed leniently: always assert what it became', async ({ pa
   await expect(page.getByTestId('due-value')).toHaveText('2026-03-03')
 })
 
+test('the calendar opens on today', async ({ page }) => {
+  const input = page.getByRole('combobox', { name: 'Due date', exact: true })
+  await input.click()
+  const panel = page.locator(`[id="${await input.getAttribute('aria-controls')}"]`)
+  // "Today" is the frozen clock: 10 March 2026.
+  await expect(panel.locator('.el-date-picker__header')).toContainText('2026')
+  await expect(panel.locator('.el-date-picker__header')).toContainText('March')
+  await expect(panel.locator('td.today')).toHaveText('10')
+})
+
 test('pick a day from the panel with the clock frozen', async ({ page }) => {
   await pickDay(page, 'Due date', 1)
   // March 1st, not April 1st (also shown in the grid) and not 10-19/21/31.
@@ -83,7 +96,7 @@ test('why pickDay filters on td.available', async ({ page }) => {
   expect(await panel.getByRole('gridcell', { name: '1' }).count()).toBeGreaterThan(2)
   // ...and even an exact match finds March 1 AND the trailing April 1.
   await expect(panel.getByRole('gridcell', { name: '1', exact: true })).toHaveCount(2)
-  // Robust: only cells of the shown month carry the `available` class.
+  // Better: only cells of the shown month carry the `available` class.
   await expect(panel.locator('td.available').filter({ hasText: exactText('1') })).toHaveCount(1)
 })
 
@@ -94,7 +107,7 @@ test.describe('without value-format, in a timezone east of UTC', () => {
     await pickDay(page, 'Plain date', 15)
     // v-model is a Date at local midnight; JSON turns it into UTC (11 h earlier in March).
     await expect(page.getByTestId('plain-value')).toHaveText('"2026-03-14T13:00:00.000Z"')
-    // Robust fix lives in the app: set value-format="YYYY-MM-DD" (see "Due date").
+    // The fix lives in the app: set value-format="YYYY-MM-DD" (see "Due date").
   })
 })
 

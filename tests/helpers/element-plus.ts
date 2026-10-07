@@ -1,6 +1,6 @@
 /**
  * Small, dependency-free helpers for driving Element Plus components from
- * Playwright. Each helper encodes one "robust pattern" from the recipes;
+ * Playwright. Each helper is the working pattern from one recipe;
  * the spec files explain the pitfall it avoids.
  */
 import { expect, type Locator, type Page } from '@playwright/test'
@@ -293,4 +293,350 @@ export function columnTexts(table: Locator, columnClass: string): Promise<string
     .locator(`td.${columnClass}`)
     .allInnerTexts()
     .then((texts) => texts.map((t) => t.trim()))
+}
+
+// ---------------------------------------------------------------------------
+// Teleported poppers in general
+// ---------------------------------------------------------------------------
+
+/**
+ * The element that `trigger` points at through `aria-controls` (default) or
+ * `aria-describedby`. Element Plus teleports poppers to `<body>`, so this id
+ * link is the only thing that ties a trigger to ITS popper.
+ *
+ * Some components (cascader, tooltip, popconfirm) only set
+ * `aria-describedby` while the popper is open, so call this after opening.
+ */
+export async function popperOf(
+  page: Page,
+  trigger: Locator,
+  attribute: 'aria-controls' | 'aria-describedby' = 'aria-controls',
+): Promise<Locator> {
+  await expect(trigger).toHaveAttribute(attribute, /.+/)
+  const id = await trigger.getAttribute(attribute)
+  return page.locator(`[id="${id}"]`)
+}
+
+// ---------------------------------------------------------------------------
+// el-cascader
+// ---------------------------------------------------------------------------
+
+/**
+ * The `.el-cascader` root whose text input has the given accessible name.
+ * The cascader input is a plain `textbox` (not a combobox) with no
+ * `aria-controls`.
+ */
+export function cascaderRoot(page: Page, label: Name): Locator {
+  return page.locator('.el-cascader', { has: page.getByRole('textbox', byName(label)) })
+}
+
+/**
+ * Open a cascader and return ITS panel. The wrapper only gets
+ * `aria-describedby` (pointing at the teleported panel) while open.
+ */
+export async function openCascader(page: Page, label: Name): Promise<Locator> {
+  const root = cascaderRoot(page, label)
+  if ((await root.getAttribute('aria-describedby')) === null) await root.click()
+  const panel = await popperOf(page, root, 'aria-describedby')
+  await expect(panel).toBeVisible()
+  return panel
+}
+
+/**
+ * Click through a cascader path, e.g. `['Fruit', 'Citrus', 'Lemon']`.
+ * Clicking a parent only opens the next column; the model changes when the
+ * leaf is clicked, and then the panel closes.
+ */
+export async function pickCascaderPath(page: Page, label: Name, path: string[]): Promise<void> {
+  const panel = await openCascader(page, label)
+  for (const step of path) {
+    await panel.getByRole('menuitem', { name: step, exact: true }).click()
+  }
+  await expect(panel).toBeHidden()
+}
+
+// ---------------------------------------------------------------------------
+// el-tree / el-tree-select
+// ---------------------------------------------------------------------------
+
+/** A tree node by its exact label ("Fiction" must not match "Non-fiction"). */
+export function treeNode(scope: Locator, label: string): Locator {
+  return scope.getByRole('treeitem', { name: label, exact: true })
+}
+
+/**
+ * Expand a tree node if it is collapsed. Child nodes are not rendered at all
+ * until their parent has been expanded once.
+ */
+export async function expandTreeNode(scope: Locator, label: string): Promise<void> {
+  const node = treeNode(scope, label)
+  if ((await node.getAttribute('aria-expanded')) !== 'true') {
+    // The first expand icon inside the node is the node's own.
+    await node.locator('.el-tree-node__expand-icon').first().click()
+  }
+  await expect(node).toHaveAttribute('aria-expanded', 'true')
+}
+
+/**
+ * Check or uncheck a tree node through its checkbox label. Clicking the node
+ * text only expands it (unless the app sets `check-on-click-node`).
+ */
+export async function setTreeChecked(scope: Locator, label: string, checked: boolean): Promise<void> {
+  const node = treeNode(scope, label)
+  // `.first()`: an expanded node also contains its children's checkboxes.
+  await node.locator('label.el-checkbox').first().setChecked(checked)
+  await expect(node.getByRole('checkbox').first()).toBeChecked({ checked })
+}
+
+/**
+ * Pick a node in an el-tree-select by its path, e.g. `['Fiction', 'Emma']`.
+ * Parents are expanded, then the last label is clicked as an option.
+ */
+export async function selectTreeNode(page: Page, label: Name, path: string[]): Promise<void> {
+  const listbox = await openSelect(page, label)
+  for (const parent of path.slice(0, -1)) await expandTreeNode(listbox, parent)
+  await listbox.getByRole('option', { name: path[path.length - 1], exact: true }).click()
+  await expect(listbox).toBeHidden()
+}
+
+// ---------------------------------------------------------------------------
+// el-autocomplete
+// ---------------------------------------------------------------------------
+
+/**
+ * The suggestion listbox of an el-autocomplete. The named element is the
+ * `textbox`; the `combobox` role sits on an unnamed wrapper.
+ */
+export async function autocompleteListbox(page: Page, label: Name): Promise<Locator> {
+  return popperOf(page, page.getByRole('textbox', byName(label)))
+}
+
+/**
+ * Type a query and click a suggestion. Pass `expected` (the full list the
+ * query should produce) so the click cannot land on the previous query's
+ * results, which stay on screen until the debounce has run.
+ */
+export async function pickSuggestion(
+  page: Page,
+  label: Name,
+  query: string,
+  option: string,
+  expected?: string[],
+): Promise<void> {
+  const input = page.getByRole('textbox', byName(label))
+  const listbox = await autocompleteListbox(page, label)
+  await input.fill(query)
+  if (expected) await expect(listbox.getByRole('option')).toHaveText(expected)
+  await listbox.getByRole('option', { name: option, exact: true }).click()
+  await expect(listbox).toBeHidden()
+}
+
+// ---------------------------------------------------------------------------
+// el-input-number
+// ---------------------------------------------------------------------------
+
+/**
+ * Type a number and commit it with Tab. min/max/step-strictly/precision are
+ * only applied on commit, and `change` only fires then.
+ * Returns the committed text so you can see what the component made of it.
+ */
+export async function setInputNumber(page: Page, label: Name, value: number | string): Promise<string> {
+  const input = page.getByRole('spinbutton', byName(label))
+  await input.fill(String(value))
+  await input.press('Tab')
+  return input.inputValue()
+}
+
+/** The +/- control of an el-input-number. Every field has the same names. */
+export function inputNumberButton(page: Page, label: Name, which: 'increase' | 'decrease'): Locator {
+  return page
+    .locator('.el-input-number', { has: page.getByRole('spinbutton', byName(label)) })
+    .getByRole('button', { name: `${which} number`, exact: true })
+}
+
+// ---------------------------------------------------------------------------
+// el-time-picker
+// ---------------------------------------------------------------------------
+
+/**
+ * Type a time into an el-time-picker in its display format and commit it.
+ * Opens the panel first, like a user would. Opening it writes the current
+ * time into the input, so the helper types over that value afterwards.
+ */
+export async function typeTime(page: Page, label: Name, displayValue: string): Promise<void> {
+  const input = combobox(page, label)
+  await input.click()
+  await expect(await popperOf(page, input)).toBeVisible()
+  await input.fill(displayValue)
+  await input.press('Enter')
+  await expect(input).toHaveValue(displayValue)
+}
+
+// ---------------------------------------------------------------------------
+// el-upload
+// ---------------------------------------------------------------------------
+
+/** The hidden `<input type="file">` of an el-upload (it has `display: none`). */
+export function uploadInput(upload: Locator): Locator {
+  return upload.locator('input[type="file"]')
+}
+
+/**
+ * File names in the upload list. Use these instead of the list item text:
+ * each item also contains a hidden "press delete to remove" hint, which
+ * toHaveText() includes.
+ */
+export function uploadedFileNames(scope: Locator): Locator {
+  return scope.locator('.el-upload-list__item-file-name')
+}
+
+/**
+ * Answer an upload endpoint with a fixed JSON body instead of a real server.
+ * Without this, the POST fails and el-upload drops the file from its list.
+ */
+export async function fakeUploadEndpoint(
+  page: Page,
+  url: string | RegExp,
+  body: unknown = { ok: true },
+  status = 200,
+): Promise<void> {
+  await page.route(url, (route) => route.fulfill({ status, json: body }))
+}
+
+// ---------------------------------------------------------------------------
+// el-pagination
+// ---------------------------------------------------------------------------
+
+/**
+ * A page number in an el-pagination. Pages are `listitem`s labelled
+ * "page N", not buttons, and "page 1" also matches "page 10" unless exact.
+ */
+export function pageButton(pagination: Locator, n: number): Locator {
+  return pagination.getByRole('listitem', { name: `page ${n}`, exact: true })
+}
+
+/** The page that is currently selected (`aria-current="true"`). */
+export function currentPage(pagination: Locator): Locator {
+  return pagination.locator('.el-pager li[aria-current="true"]')
+}
+
+/** Type into the "Go to" jumper and commit with Enter. Values are clamped. */
+export async function jumpToPage(pagination: Locator, n: number): Promise<void> {
+  const jumper = pagination.getByRole('spinbutton')
+  await jumper.fill(String(n))
+  await jumper.press('Enter')
+}
+
+// ---------------------------------------------------------------------------
+// el-dropdown
+// ---------------------------------------------------------------------------
+
+/**
+ * Open an el-dropdown and return its teleported menu. Works for both
+ * triggers: hover first (trigger="hover", the default), and if the menu did
+ * not open, click (trigger="click").
+ *
+ * A hover menu closes as soon as the mouse leaves trigger and menu, so do not
+ * move the mouse elsewhere between opening and picking.
+ */
+export async function openDropdown(page: Page, trigger: Locator): Promise<Locator> {
+  const menu = await popperOf(page, trigger)
+  await trigger.hover()
+  try {
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true', { timeout: 1_000 })
+  } catch {
+    await trigger.click()
+  }
+  await expect(menu).toBeVisible()
+  return menu
+}
+
+/** Open a dropdown and click one of its items by exact text. */
+export async function dropdownCommand(page: Page, trigger: Locator, item: string): Promise<void> {
+  const menu = await openDropdown(page, trigger)
+  await menu.getByRole('menuitem', { name: item, exact: true }).click()
+  await expect(menu).toBeHidden()
+}
+
+// ---------------------------------------------------------------------------
+// el-popconfirm / el-tooltip
+// ---------------------------------------------------------------------------
+
+/**
+ * Click a popconfirm's reference button and answer it. Returns the popper
+ * (role="tooltip", not "dialog"). The default button texts are "Yes" and
+ * "No"; pass yours if the app sets confirm/cancel-button-text.
+ */
+export async function answerPopconfirm(
+  page: Page,
+  reference: Locator,
+  answer: string,
+): Promise<void> {
+  await reference.click()
+  const popper = await popperOf(page, reference, 'aria-describedby')
+  await expect(popper).toBeVisible()
+  await popper.getByRole('button', { name: answer, exact: true }).click()
+  await expect(popper).toBeHidden()
+}
+
+// ---------------------------------------------------------------------------
+// ElNotification
+// ---------------------------------------------------------------------------
+
+/** All ElNotification boxes currently on screen. */
+export function notifications(page: Page): Locator {
+  return page.locator('.el-notification')
+}
+
+/**
+ * One notification, matched by its exact title. The title renders as a
+ * level-2 heading inside the box.
+ */
+export function notification(page: Page, title: string): Locator {
+  return notifications(page).filter({ has: page.getByRole('heading', { name: title, exact: true }) })
+}
+
+/**
+ * Wait until every notification has closed. Moves the mouse away first:
+ * a notification under the mouse pauses its own timer and never closes.
+ * Sticky ones (`duration: 0`) never close by themselves; close them first.
+ */
+export async function drainNotifications(page: Page, timeout = 10_000): Promise<void> {
+  await page.mouse.move(0, 0)
+  await expect(notifications(page)).toHaveCount(0, { timeout })
+}
+
+/** Close a notification with its x icon (an `<i>`, not a button). */
+export async function closeNotification(page: Page, title: string): Promise<void> {
+  const box = notification(page, title)
+  await box.locator('.el-notification__closeBtn').click()
+  await expect(box).toHaveCount(0)
+}
+
+// ---------------------------------------------------------------------------
+// el-collapse
+// ---------------------------------------------------------------------------
+
+/** A collapse item's header (role="button") by its exact title. */
+export function collapseHeader(page: Page, title: string): Locator {
+  return page.getByRole('button', { name: title, exact: true })
+}
+
+/**
+ * Open or close a collapse item. Clicking the header toggles, so check
+ * `aria-expanded` first. Waits for the end of the height transition when
+ * opening, because the content counts as "visible" from its first pixel.
+ */
+export async function setCollapseItem(page: Page, title: string, open: boolean): Promise<void> {
+  const header = collapseHeader(page, title)
+  if ((await header.getAttribute('aria-expanded')) !== String(open)) await header.click()
+  await expect(header).toHaveAttribute('aria-expanded', String(open))
+  const content = page.locator(`[id="${await header.getAttribute('aria-controls')}"]`)
+  if (open) {
+    await expect(content).toBeVisible()
+    // The wrapper animates its inline height; it is done when no height is set.
+    await expect(content).not.toHaveAttribute('style', /height/)
+  } else {
+    await expect(content).toBeHidden()
+  }
 }

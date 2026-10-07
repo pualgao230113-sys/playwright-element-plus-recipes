@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { recipeRoutes } from './router'
+
+const licensesUrl = `${import.meta.env.BASE_URL}third-party-licenses.md`
 </script>
 
 <template>
@@ -7,6 +9,8 @@ import { recipeRoutes } from './router'
     <nav class="sidebar" aria-label="Recipes">
       <h1>EP recipes</h1>
       <RouterLink v-for="r in recipeRoutes" :key="r.path" :to="r.path">{{ r.meta.title }}</RouterLink>
+      <!-- Written by `vite build`; it does not exist in dev. -->
+      <a class="licenses" :href="licensesUrl">Third-party licenses</a>
     </nav>
     <main class="content">
       <RouterView />
@@ -21,6 +25,7 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #fff; color: #
 .sidebar h1 { font-size: 16px; margin: 0 0 8px; }
 .sidebar a { color: #409eff; text-decoration: none; font-size: 14px; }
 .sidebar a.router-link-active { font-weight: 600; }
+.sidebar a.licenses { margin-top: 16px; color: #909399; font-size: 12px; }
 .content { flex: 1; padding: 24px; min-width: 0; }
 .content section { margin-bottom: 32px; }
 .content h2 { font-size: 18px; margin: 0 0 12px; }

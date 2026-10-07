@@ -28,7 +28,7 @@ test('match a toast by its text, not by position', async ({ page }) => {
   //   -> strict mode violation (2 elements). With .first() it reads "Book saved".
   await expect(page.getByRole('alert').first()).toHaveText('Book saved')
 
-  // Robust: filter by the exact text you expect.
+  // Better: filter by the exact text you expect.
   await expect(message(page, 'Book deleted')).toBeVisible()
 })
 
@@ -60,7 +60,7 @@ test('toHaveCount(0) is fooled by a toast that flashed and faded', async ({ page
   // Naive: this PASSES - it keeps retrying until the toast has faded.
   await expect(messages(page)).toHaveCount(0)
 
-  // Robust: a MutationObserver installed before the action saw it.
+  // Better: a MutationObserver installed before the action saw it.
   expect(await recorded()).toEqual(['Unexpected warning'])
 })
 

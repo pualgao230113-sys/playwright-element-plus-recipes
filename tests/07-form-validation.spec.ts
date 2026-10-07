@@ -26,7 +26,7 @@ test('the required asterisk is part of the accessible name', async ({ page }) =>
   await expect(page.getByRole('textbox', { name: 'Username', exact: true })).toHaveCount(0)
   // What the accessibility tree really says:
   await expect(page.getByRole('textbox', { name: '* Username', exact: true })).toHaveCount(1)
-  // Robust: anchor a RegExp at the end (still rejects "Old username" etc.).
+  // Better: anchor a RegExp at the end (still rejects "Old username" etc.).
   await expect(page.getByRole('textbox', { name: /Username$/ })).toHaveCount(1)
   await expect(page.getByRole('combobox', { name: /Favourite fruit$/ })).toHaveCount(1)
 })
@@ -42,17 +42,19 @@ test('blur-triggered rules need a real blur', async ({ page }) => {
   // Naive: expect the "required" error now. Nothing happens - trigger is 'blur'.
   await expect(formError(page, 'Username')).toHaveCount(0)
 
-  // Robust: move focus away like a user would.
+  // Better: move focus away like a user would.
   await username.press('Tab')
   await expect(formError(page, 'Username')).toHaveText('Username is required')
 })
 
-test('async validator: wait for the verdict, not just for "no error"', async ({ page }) => {
+test('async validator: wait for the verdict, not for "no error"', async ({ page }) => {
   const username = page.getByRole('textbox', { name: /Username$/ })
   const item = formItem(page, 'Username')
 
   await username.fill('admin')
   await username.press('Tab')
+  // Naive: "no error" passes right away, before the validator has answered...
+  await expect(formError(page, 'Username')).toHaveCount(0, { timeout: 100 })
   // While the fake server call runs the item carries `is-validating`.
   await expect(item).toHaveClass(/is-validating/)
   await expect(formError(page, 'Username')).toHaveText('That username is taken')
@@ -60,7 +62,7 @@ test('async validator: wait for the verdict, not just for "no error"', async ({ 
   await username.fill('bookworm')
   await username.press('Tab')
   // Naive: expect(formError(...)).toHaveCount(0) - can pass while the old
-  // error is fading or before the new verdict lands. Robust: wait for the
+  // error is fading or before the new verdict lands. Better: wait for the
   // positive success state, then check the error is gone.
   await expect(item).toHaveClass(/is-success/)
   await expect(formError(page, 'Username')).toHaveCount(0)
