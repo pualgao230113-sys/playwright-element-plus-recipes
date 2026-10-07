@@ -2,6 +2,8 @@
 
 [English](README.md) | **简体中文** | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | [Bahasa Melayu](README.ms.md) | [हिन्दी](README.hi.md)
 
+[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/)
+
 Element Plus 组件有些行为会让 Playwright 测试挂得莫名其妙：下拉框渲染在页面的别处、input 是隐藏的、消息提示会叠加、值要等失焦才提交。这个仓库里有一个小演示应用，每个组件一个页面；每个组件配一个 Playwright spec，把问题实际复现出来；还有一个 helper 文件，你可以直接用在自己的测试里。
 
 <p align="center"><img src="docs/demo.gif" alt="Playwright 操作演示应用：从下拉框里选值、叠加的消息提示、选择日期" width="720"></p>
@@ -71,7 +73,7 @@ ESM 和 CommonJS 的测试项目都能用，类型定义也一起带上了。每
 
 | # | 组件 | 坑 | 怎么做 | Spec |
 |---|---|---|---|---|
-| 01 | `el-select` | **Common:** 选项被 teleport 到 `<body>`，不在 select 内部渲染。<br>**Common:** 在不可筛选的 select（默认就是）上，点击 combobox 的 `<input>` 会被 placeholder 拦截。可筛选的 select 的 input 是能点的。<br>**Common:** `multiple` 下拉框每选一项后都保持展开。<br>**Specific**（`remote`）：第一批结果返回之前，下拉框一直是隐藏的。 | 点击 `.el-select` 根元素。顺着 `aria-controls` 找到这个 select 自己的 listbox。多选后按 Escape。等待选项出现，不要固定等一段时间。 | [01-select](tests/01-select.spec.ts) |
+| 01 | `el-select` | **Common:** 选项被 teleport 到 `<body>`，不在 select 内部渲染。<br>**Common:** 在不可筛选的 select（默认就是）上，点击 combobox 的 `<input>` 会被 placeholder 拦截。可筛选的 select 的 input 能点，只有 2.13.3–2.14.1 这几个版本也会被 placeholder 拦截。<br>**Common:** `multiple` 下拉框每选一项后都保持展开。<br>**Specific**（`remote`）：第一批结果返回之前，下拉框一直是隐藏的。 | 点击 `.el-select` 根元素。顺着 `aria-controls` 找到这个 select 自己的 listbox。多选后按 Escape。等待选项出现，不要固定等一段时间。 | [01-select](tests/01-select.spec.ts) |
 | 02 | `ElMessage` | **Common:** 消息提示会叠加，所以 `getByRole('alert')` 也会命中更早的提示。<br>**Common:** 一个出现后又淡出的提示，`toHaveCount(0)` 照样会通过。 | 按精确文本匹配提示。重复某个操作前先调用 `drainMessages()`。要证明“没有提示”，在操作之前就启动 `recordMessages()`。 | [02-message](tests/02-message.spec.ts) |
 | 03 | `el-checkbox` / `el-radio` / `el-switch` | **Common:** 真实的 input 是隐藏的：`check()` 会超时，加 `force` 则报 "outside of the viewport"。<br>**Specific**（`active-text` / `inactive-text`）：开关的文字是切换状态，不是设置状态。<br>**Specific**（`el-form-item` 里的开关，通过 label 点击）：原生的 `checked` 与 `aria-checked` 不一致。 | 用 `setChecked()` helper。它会对 checkbox 的 `label.el-checkbox` 调用 Playwright 的 `setChecked()`（只适用于普通 checkbox，不适用于 `el-checkbox-button`）。radio 的话，对 `radiogroup` 里它的 `<label>` 调用 Playwright 的 `check()`。从 `aria-checked` 读取开关状态，不要用 `toBeChecked()`。 | [03-checkbox-radio-switch](tests/03-checkbox-radio-switch.spec.ts) |
 | 04 | `el-date-picker` | **Common:** `format`（显示用）和 `value-format`（存储用）是两回事。<br>**Common:** 输入的文字只有在回车或失焦时才会进入 model。<br>**Common:** 网格里的日期数字会重复（下个月的头几天也会显示出来）。<br>**Common:** 日历打开时停在今天，所以点哪一天取决于当前日期。<br>**Specific**（没有 `value-format`，时区在 UTC 以东）：日期会被序列化成前一天。<br>**Specific**（手动输入，2.14.4+）：解析很宽松：`3/4/2026` 变成 3 月 4 日，`31/02/2026` 变成 3 月 3 日，`15/3/2026` 会被拒绝，旧值保留。 | 按显示格式输入，然后同时检查 input 和 model。用 `page.clock` 冻结时钟。只点 `td.available` 单元格。在应用里设置 `value-format`。 | [04-date-picker](tests/04-date-picker.spec.ts) |
@@ -115,6 +117,7 @@ Vue 3.5.43、@playwright/test 1.63.0（Chromium headless shell）、Vite 8.3.3�
 | 2.12.0 | 多选 select 里 tag 的关闭图标变成了一个名为 "Close this tag" 的按钮。spec 用的是 `.el-tag__close`，所有版本都能用。 | 01 |
 | 2.13.0 | 可排序的表头加上了 `aria-sort` 和一个 "Sort by X" 按钮。 | 06 |
 | 2.13.1 | autocomplete textbox 的 `aria-controls` 指向 listbox。之前它是字面字符串 `"id"`。 | 12 |
+| 2.13.3–2.14.1 | 可筛选的 select 的 input 也会被 placeholder 拦截。2.14.2 修好了。 | 01 |
 | 2.13.4 | 在空的时间选择器上点 Cancel，model 里留下的是 `null`。之前是空字符串。 | 14 |
 | 2.14.0 | input 的清除图标在隐藏时也留在 DOM 里。之前只在 hover 时才渲染。不管哪种，都先 hover。 | 08 |
 | 2.14.4 | 手动输入的日期按宽松方式解析（`3/4/2026` 变成 3 月 4 日）。之前 `3/4/2026` 会被拒绝。 | 04 |

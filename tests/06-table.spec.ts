@@ -89,16 +89,22 @@ test('sorting: click the header cell to cycle, or a caret to set', async ({ page
   await waitForTable(table)
   const yearHeader = table.locator('th.col-year')
 
-  // Clicking the header cell cycles ascending -> descending -> none.
-  await yearHeader.click()
+  // Clicking the header cell cycles ascending -> descending -> none. Click its
+  // left edge, not the centre: depending on fonts the centre can land on the
+  // "Sort by" button, which jumps straight to descending (seen on Linux CI).
+  const edge = async () => {
+    const box = await yearHeader.boundingBox()
+    await yearHeader.click({ position: { x: 4, y: box!.height / 2 } })
+  }
+  await edge()
   await expect(yearHeader).toHaveAttribute('aria-sort', 'ascending')
   await expect.poll(() => columnTexts(table, 'col-year')).toEqual(['1815', '1817', '1871', '1965', '1984'])
 
-  await yearHeader.click()
+  await edge()
   await expect(yearHeader).toHaveAttribute('aria-sort', 'descending')
   await expect.poll(() => columnTexts(table, 'col-year')).toEqual(['1984', '1965', '1871', '1817', '1815'])
 
-  await yearHeader.click()
+  await edge()
   await expect(yearHeader).toHaveAttribute('aria-sort', '')
   await expect.poll(() => columnTexts(table, 'col-title')).toEqual(['Dune', 'Emma', 'Middlemarch', 'Neuromancer', 'Persuasion'])
 

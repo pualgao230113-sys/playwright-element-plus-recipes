@@ -25,6 +25,7 @@ import {
   selectRoot,
   selectTags,
 } from './helpers/element-plus'
+import { epAtLeast } from './support/version'
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/select')
@@ -55,11 +56,16 @@ test('click the select wrapper, not the combobox input', async ({ page }) => {
   await selectRoot(page, 'Fruit').click()
   await expect(combobox).toHaveAttribute('aria-expanded', 'true')
 
-  // Only non-filterable selects do this: a filterable select's input is clickable.
+  // A filterable select's input is clickable, except in 2.13.3–2.14.1 where
+  // the placeholder intercepts it there too (fixed in 2.14.2).
   await page.keyboard.press('Escape')
   const filtered = page.getByRole('combobox', { name: 'Filtered fruit', exact: true })
-  await filtered.click()
-  await expect(filtered).toHaveAttribute('aria-expanded', 'true')
+  if (!(epAtLeast('2.13.3') && !epAtLeast('2.14.2'))) {
+    await filtered.click()
+    await expect(filtered).toHaveAttribute('aria-expanded', 'true')
+  } else {
+    await expect(filtered.click({ timeout: 1_000, trial: true })).rejects.toThrow(/intercepts pointer events/)
+  }
 })
 
 test('pick an option by exact name from the right listbox', async ({ page }) => {

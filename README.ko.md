@@ -2,6 +2,8 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | **한국어** | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | [Bahasa Melayu](README.ms.md) | [हिन्दी](README.hi.md)
 
+[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/)
+
 Element Plus 컴포넌트에는 Playwright 테스트를 헷갈리는 방식으로 깨뜨리는 동작이 있습니다. 드롭다운이 페이지의 다른 곳에 렌더링되고, input이 숨겨져 있고, 토스트가 쌓이고, 값이 blur 때만 반영되는 식입니다. 이 저장소에는 컴포넌트마다 페이지가 하나씩 있는 작은 데모 앱, 컴포넌트마다 그 문제가 실제로 일어나는 걸 보여 주는 Playwright spec, 그리고 여러분의 테스트에서 쓸 수 있는 헬퍼 파일이 들어 있습니다.
 
 <p align="center"><img src="docs/demo.gif" alt="데모 앱을 조작하는 Playwright: select에서 고르기, 토스트 쌓기, 날짜 고르기" width="720"></p>
@@ -71,7 +73,7 @@ ESM과 CommonJS 테스트 프로젝트 둘 다에서 쓸 수 있고, 타입도 �
 
 | # | 컴포넌트 | 함정 | 대처 | Spec |
 |---|---|---|---|---|
-| 01 | `el-select` | **Common:** 옵션이 select 안이 아니라 `<body>`로 teleport됩니다.<br>**Common:** filterable이 아닌 select(기본값)에서는 combobox `<input>`을 클릭하면 placeholder가 클릭을 가로챕니다. filterable select의 input은 클릭할 수 있습니다.<br>**Common:** `multiple` select는 하나 고를 때마다 열린 채로 있습니다.<br>**Specific** (`remote`): 첫 결과가 올 때까지 드롭다운이 숨겨져 있습니다. | `.el-select` 루트를 클릭합니다. `aria-controls`를 따라가 그 select의 listbox를 찾습니다. 여러 개를 고른 뒤에는 Escape를 누릅니다. 고정된 시간이 아니라 옵션이 나타나기를 기다립니다. | [01-select](tests/01-select.spec.ts) |
+| 01 | `el-select` | **Common:** 옵션이 select 안이 아니라 `<body>`로 teleport됩니다.<br>**Common:** filterable이 아닌 select(기본값)에서는 combobox `<input>`을 클릭하면 placeholder가 클릭을 가로챕니다. filterable select의 input은 클릭할 수 있습니다. 단, 2.13.3–2.14.1에서는 이것도 placeholder가 가로챕니다.<br>**Common:** `multiple` select는 하나 고를 때마다 열린 채로 있습니다.<br>**Specific** (`remote`): 첫 결과가 올 때까지 드롭다운이 숨겨져 있습니다. | `.el-select` 루트를 클릭합니다. `aria-controls`를 따라가 그 select의 listbox를 찾습니다. 여러 개를 고른 뒤에는 Escape를 누릅니다. 고정된 시간이 아니라 옵션이 나타나기를 기다립니다. | [01-select](tests/01-select.spec.ts) |
 | 02 | `ElMessage` | **Common:** 토스트가 쌓이기 때문에 `getByRole('alert')`가 이전 토스트까지 잡습니다.<br>**Common:** `toHaveCount(0)`은 나타났다가 사라진 토스트에도 통과합니다. | 토스트는 정확한 텍스트로 매칭합니다. 같은 동작을 반복하기 전에 `drainMessages()`를 호출합니다. "토스트 없음"을 증명하려면 동작 전에 `recordMessages()`를 시작합니다. | [02-message](tests/02-message.spec.ts) |
 | 03 | `el-checkbox` / `el-radio` / `el-switch` | **Common:** 실제 input이 숨겨져 있습니다: `check()`는 타임아웃되고, `force`는 "outside of the viewport"로 실패합니다.<br>**Specific** (`active-text` / `inactive-text`): 스위치 텍스트는 값을 설정하지 않고 토글합니다.<br>**Specific** (`el-form-item` 안의 스위치를 label로 클릭): 네이티브 `checked`와 `aria-checked`가 서로 다릅니다. | `setChecked()` 헬퍼를 씁니다. 이 헬퍼는 체크박스의 `label.el-checkbox`에 Playwright의 `setChecked()`를 호출합니다(일반 체크박스만, `el-checkbox-button`은 제외). 라디오는 `radiogroup` 안의 `<label>`에 Playwright의 `check()`를 호출합니다. 스위치 상태는 `toBeChecked()`가 아니라 `aria-checked`에서 읽습니다. | [03-checkbox-radio-switch](tests/03-checkbox-radio-switch.spec.ts) |
 | 04 | `el-date-picker` | **Common:** `format`(표시)과 `value-format`(저장)은 서로 다른 것입니다.<br>**Common:** 입력한 텍스트는 Enter나 blur 때만 model에 들어갑니다.<br>**Common:** 그리드에 날짜 숫자가 중복됩니다(다음 달 첫 며칠도 보이기 때문).<br>**Common:** 달력이 오늘 날짜로 열리기 때문에, 날짜 클릭 결과가 실행한 날에 따라 달라집니다.<br>**Specific** (`value-format` 없음, UTC보다 동쪽 시간대): 날짜가 전날로 직렬화됩니다.<br>**Specific** (직접 입력, 2.14.4+): 파싱이 느슨합니다: `3/4/2026`은 3월 4일, `31/02/2026`은 3월 3일이 되고, `15/3/2026`은 거부되며 이전 값이 남습니다. | 표시 형식대로 입력한 다음 input과 model을 둘 다 확인합니다. `page.clock`으로 시계를 고정합니다. `td.available` 셀만 고릅니다. 앱에서 `value-format`을 설정합니다. | [04-date-picker](tests/04-date-picker.spec.ts) |
@@ -115,6 +117,7 @@ Vue 3.5.43, @playwright/test 1.63.0 (Chromium headless shell), Vite 8.3.3, Node.
 | 2.12.0 | multiple select의 태그 닫기 아이콘이 "Close this tag"라는 이름의 버튼이 됩니다. spec은 모든 버전에서 동작하는 `.el-tag__close`를 씁니다. | 01 |
 | 2.13.0 | 정렬 가능한 헤더에 `aria-sort`와 "Sort by X" 버튼이 생깁니다. | 06 |
 | 2.13.1 | autocomplete textbox의 `aria-controls`가 listbox를 가리킵니다. 그 전에는 문자열 그대로 `"id"`입니다. | 12 |
+| 2.13.3–2.14.1 | filterable select의 input도 placeholder가 클릭을 가로챕니다. 2.14.2에서 고쳐졌습니다. | 01 |
 | 2.13.4 | 빈 time picker에서 Cancel하면 model에 `null`이 남습니다. 그 전에는 빈 문자열입니다. | 14 |
 | 2.14.0 | input 지우기 아이콘이 숨겨져 있는 동안에도 DOM에 남습니다. 그 전에는 hover할 때만 렌더링됩니다. 어느 쪽이든 먼저 hover하세요. | 08 |
 | 2.14.4 | 입력한 날짜를 느슨하게 파싱합니다(`3/4/2026`은 3월 4일이 됨). 그 전에는 `3/4/2026`이 거부됩니다. | 04 |

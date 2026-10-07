@@ -2,6 +2,8 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | **日本語** | [한국어](README.ko.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | [Bahasa Melayu](README.ms.md) | [हिन्दी](README.hi.md)
 
+[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/)
+
 Element Plus のコンポーネントには、Playwright のテストをわかりにくい形で壊す挙動があります。ドロップダウンがページの別の場所に描画される、input が隠れている、トーストが積み重なる、値が blur したときにしか確定しない、などです。このリポジトリには、コンポーネントごとに 1 ページの小さなデモアプリと、その問題が実際に起きることを示すコンポーネントごとの Playwright の spec、それに自分のテストで使えるヘルパーファイルが入っています。
 
 <p align="center"><img src="docs/demo.gif" alt="Playwright がデモアプリを操作している様子: select から選ぶ、トーストを積み重ねる、日付を選ぶ" width="720"></p>
@@ -71,7 +73,7 @@ ESM と CommonJS のどちらのテストプロジェクトからでも使えて
 
 | # | コンポーネント | 落とし穴 | 対処 | Spec |
 |---|---|---|---|---|
-| 01 | `el-select` | **Common:** 選択肢は select の中ではなく `<body>` に teleport される。<br>**Common:** filterable でない select（デフォルト）では、combobox の `<input>` をクリックすると placeholder にクリックを奪われる。filterable な select の input はクリックできる。<br>**Common:** `multiple` の select は、選ぶたびに開いたままになる。<br>**Specific** (`remote`): 最初の結果が届くまでドロップダウンは非表示のまま。 | `.el-select` のルートをクリックする。`aria-controls` をたどって、その select の listbox を見つける。複数選択の後は Escape を押す。固定時間ではなく、選択肢が出るのを待つ。 | [01-select](tests/01-select.spec.ts) |
+| 01 | `el-select` | **Common:** 選択肢は select の中ではなく `<body>` に teleport される。<br>**Common:** filterable でない select（デフォルト）では、combobox の `<input>` をクリックすると placeholder にクリックを奪われる。filterable な select の input はクリックできる。ただし 2.13.3–2.14.1 では、こちらも placeholder にクリックを奪われる。<br>**Common:** `multiple` の select は、選ぶたびに開いたままになる。<br>**Specific** (`remote`): 最初の結果が届くまでドロップダウンは非表示のまま。 | `.el-select` のルートをクリックする。`aria-controls` をたどって、その select の listbox を見つける。複数選択の後は Escape を押す。固定時間ではなく、選択肢が出るのを待つ。 | [01-select](tests/01-select.spec.ts) |
 | 02 | `ElMessage` | **Common:** トーストは積み重なるので、`getByRole('alert')` が古いトーストにも当たる。<br>**Common:** `toHaveCount(0)` は、一度表示されてフェードアウトしたトーストでもパスする。 | トーストは完全一致のテキストでマッチさせる。同じ操作を繰り返す前に `drainMessages()` を呼ぶ。「トーストが出ない」ことを証明するには、操作の前に `recordMessages()` を開始する。 | [02-message](tests/02-message.spec.ts) |
 | 03 | `el-checkbox` / `el-radio` / `el-switch` | **Common:** 本物の input は非表示: `check()` はタイムアウトし、`force` を付けると "outside of the viewport" で失敗する。<br>**Specific** (`active-text` / `inactive-text`): スイッチのテキストは値をセットせず、トグルする。<br>**Specific** (`el-form-item` 内のスイッチをラベル経由でクリック): ネイティブの `checked` と `aria-checked` が食い違う。 | `setChecked()` ヘルパーを使う。これはチェックボックスの `label.el-checkbox` に対して Playwright の `setChecked()` を呼ぶ（普通のチェックボックスのみで、`el-checkbox-button` は対象外）。ラジオは、`radiogroup` 内の `<label>` に対して Playwright の `check()` を呼ぶ。スイッチの状態は `toBeChecked()` ではなく `aria-checked` から読む。 | [03-checkbox-radio-switch](tests/03-checkbox-radio-switch.spec.ts) |
 | 04 | `el-date-picker` | **Common:** `format`（表示）と `value-format`（保存）は別物。<br>**Common:** 入力したテキストは Enter か blur のときにしか model に反映されない。<br>**Common:** グリッド内で日付の数字が重複する（翌月の最初の数日も表示されるため）。<br>**Common:** カレンダーは今日の日付で開くので、日付のクリックは実行日に左右される。<br>**Specific** (`value-format` なし、UTC より東のタイムゾーン): 日付が前日としてシリアライズされる。<br>**Specific** (入力、2.14.4+): 解析が緩い: `3/4/2026` は 3 月 4 日に、`31/02/2026` は 3 月 3 日になり、`15/3/2026` は拒否されて古い値が残る。 | 表示フォーマットで入力し、input と model の両方を確認する。`page.clock` で時計を固定する。`td.available` のセルだけを選ぶ。アプリ側で `value-format` を設定する。 | [04-date-picker](tests/04-date-picker.spec.ts) |
@@ -115,6 +117,7 @@ Vue 3.5.43、@playwright/test 1.63.0（Chromium headless shell）、Vite 8.3.3�
 | 2.12.0 | multiple select のタグの閉じるアイコンが "Close this tag" という名前のボタンになる。spec では `.el-tag__close` を使っていて、どのバージョンでも動く。 | 01 |
 | 2.13.0 | ソート可能なヘッダーに `aria-sort` と "Sort by X" ボタンが付く。 | 06 |
 | 2.13.1 | autocomplete の textbox の `aria-controls` が listbox を指すようになる。それより前は文字列そのままの `"id"`。 | 12 |
+| 2.13.3–2.14.1 | filterable な select の input も placeholder にクリックを奪われる。2.14.2 で直った。 | 01 |
 | 2.13.4 | 空の time picker で Cancel すると、model に `null` が残る。それより前は空文字列。 | 14 |
 | 2.14.0 | input のクリアアイコンが、非表示の間も DOM に残る。それより前はホバー時にだけ描画される。どちらにしても先にホバーする。 | 08 |
 | 2.14.4 | 入力した日付が緩く解析される（`3/4/2026` は 3 月 4 日になる）。それより前は `3/4/2026` は拒否される。 | 04 |
