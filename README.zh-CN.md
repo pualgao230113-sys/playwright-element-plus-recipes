@@ -8,7 +8,7 @@ Element Plus 组件有些行为会让 Playwright 测试挂得莫名其妙：下�
 
 <p align="center"><img src="docs/demo.gif" alt="Playwright 操作演示应用：从下拉框里选值、叠加的消息提示、选择日期" width="720"></p>
 
-在线演示：<https://pualgao230113-sys.github.io/playwright-element-plus-recipes/>（还没上线：等仓库公开、GitHub Pages 开启后才会上线）。
+在线演示：<https://pualgao230113-sys.github.io/playwright-element-plus-recipes/>
 
 与 Element Plus 和 Playwright 均无关联。这两个名字只用来说明本项目测试的是什么。
 
@@ -17,7 +17,7 @@ Element Plus 组件有些行为会让 Playwright 测试挂得莫名其妙：下�
 ```bash
 git clone https://github.com/pualgao230113-sys/playwright-element-plus-recipes.git
 cd playwright-element-plus-recipes
-npm install
+npm ci
 npx playwright install chromium   # first time only
 npm test                          # starts the demo app on :5179 and runs every recipe
 ```
@@ -26,33 +26,22 @@ npm test                          # starts the demo app on :5179 and runs every 
 |---|---|
 | `npm run dev` | 演示应用，地址 <http://localhost:5179>，每个示例一个页面 |
 | `npm test` | 完整的 Playwright 测试套件（headless Chromium，1 个 worker） |
-| `npm run test:ui` | Playwright UI 模式，适合一步步看某个示例 |
+| `npm run test:ui` | Playwright UI 模式，用来一步步走完某个示例 |
 | `npm run typecheck` | 对应用、spec 和 helper 做类型检查 |
 | `npm run build` | 把演示应用构建到 `dist/` |
-| `npm run build:helpers` | 把 helper 构建到 `dist-helpers/` |
+| `npm run build:helpers` | 把 `playwright-element-plus` 包构建到 `packages/playwright-element-plus/dist/` |
 
 ## 在你自己的项目里使用 helper
 
-从 GitHub 安装。它没有发布到 npm。
-
 ```bash
-npm i -D github:pualgao230113-sys/playwright-element-plus-recipes
+npm i -D playwright-element-plus
 ```
 
-npm 会在安装时构建 helper（靠的是这个包的 `prepare` 脚本），所以第一次安装要花一分钟左右。你的项目里需要已经装好 `@playwright/test`；它是 peer dependency，测试时用的是 1.63。
-
-pnpm 会拦下依赖的构建脚本，所以要先在 `pnpm-workspace.yaml` 里放行这个包。pnpm 11 这样写：
-
-```yaml
-allowBuilds:
-  playwright-element-plus-recipes: true
-```
-
-如果是 pnpm 10，就把 pnpm 在 `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` 报错里打印出来的那一项加到 `onlyBuiltDependencies` 里。git 依赖的这一项带着 commit，所以每次更新它都会变。
+你的项目里需要已经装好 `@playwright/test`；它是 peer dependency，测试时用的是 1.63。
 
 ```ts
 import { expect, test } from '@playwright/test'
-import { drainMessages, message, selectOption } from 'playwright-element-plus-recipes'
+import { drainMessages, message, selectOption } from 'playwright-element-plus'
 
 test('save a fruit', async ({ page }) => {
   await page.goto('/fruits')
@@ -63,7 +52,24 @@ test('save a fruit', async ({ page }) => {
 })
 ```
 
-ESM 和 CommonJS 的测试项目都能用，类型定义也一起带上了。每个 helper 都在 [docs/helpers.md](docs/helpers.md) 里列出并附有示例。如果你不想多加一个依赖，就把 [`tests/helpers/element-plus.ts`](tests/helpers/element-plus.ts) 复制到你的项目里。它只 import 了 `@playwright/test`。
+ESM 和 CommonJS 的测试项目都能用，类型定义也一起带上了。每个 helper 都在 [docs/helpers.md](docs/helpers.md) 里列出并附有示例。这个包自己的 README 在 [packages/playwright-element-plus/README.md](packages/playwright-element-plus/README.md)。如果你不想多加一个依赖，就把 [`packages/playwright-element-plus/src/index.ts`](packages/playwright-element-plus/src/index.ts) 复制到你的项目里。它只 import 了 `@playwright/test`。
+
+### 改从 GitHub 安装
+
+```bash
+npm i -D github:pualgao230113-sys/playwright-element-plus-recipes
+```
+
+这样装上的包名是 `playwright-element-plus-recipes`，所以要改成从 `'playwright-element-plus-recipes'` import。npm 会在安装时构建 helper（靠的是这个仓库的 `prepare` 脚本），所以第一次安装要花一分钟左右。
+
+pnpm 会拦下依赖的构建脚本，所以要先在 `pnpm-workspace.yaml` 里放行这个包。pnpm 11 这样写：
+
+```yaml
+allowBuilds:
+  playwright-element-plus-recipes: true
+```
+
+如果是 pnpm 10，就把 pnpm 在 `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` 报错里打印出来的那一项加到 `onlyBuiltDependencies` 里。git 依赖的这一项带着 commit，所以每次更新它都会变。
 
 ## 示例
 
@@ -99,15 +105,15 @@ ESM 和 CommonJS 的测试项目都能用，类型定义也一起带上了。每
 
 Vue 3.5.43、@playwright/test 1.63.0（Chromium headless shell）、Vite 8.3.3、Node.js 24。
 
-下面每个 Element Plus 版本都单独安装，并用它跑了整套测试（109 个测试）。如果某个行为在版本之间有变化，spec 要么跳过并在原因里写明版本，要么针对每个版本断言对应的正确值。CI 会跑三个受支持的版本。
+下面每个 Element Plus 版本都单独安装，并用它跑了整套测试（111 个测试）。如果某个行为在版本之间有变化，spec 要么跳过并在原因里写明版本，要么针对每个版本断言对应的正确值。CI 会跑三个受支持的版本。
 
 | Element Plus | 结果 | 说明 |
 |---|---|---|
-| 2.14.7 | 109 个通过 | 撰写本文时的最新版本。所有示例都适用。 |
-| 2.13.7 | 107 个通过，2 个跳过 | 还没有宽松的日期解析（04），input 计数器上没有 `role="status"`（08）。 |
-| 2.9.11 | 102 个通过，7 个跳过 | 另外：表格里没有 "Sort by" 按钮和 `aria-sort`（06），autocomplete 的 `aria-controls` 不指向它的 listbox（12）。 |
-| 2.7.8 | 不支持：10 个失败 | 日期和时间选择器的 input 没有 `combobox` role，所以对应的 helper 什么也找不到。 |
-| 2.4.4 | 不支持：16 个失败 | 和 2.7.8 一样，另外 select、checkbox / radio、dialog 和 tree-select 还有 6 个失败（比如 select 的 placeholder 不会挡住对 input 的点击）。 |
+| 2.14.7 | 111 个通过 | 所有示例都适用。 |
+| 2.13.7 | 109 个通过，2 个跳过 | 还没有宽松的日期解析（04），input 计数器上没有 `role="status"`（08）。 |
+| 2.9.11 | 104 个通过，7 个跳过 | 另外：表格里没有 "Sort by" 按钮和 `aria-sort`（06），autocomplete 的 `aria-controls` 不指向它的 listbox（12）。 |
+| 2.7.8 | 不支持：13 个失败，7 个跳过 | 日期和时间选择器的 input 没有 `combobox` role，所以对应的 helper 什么也找不到。另外，可筛选的 select 的 placeholder 仍然会挡住对 input 的点击（01），点击外部也不会关闭 popconfirm（19）。 |
+| 2.4.4 | 不支持：19 个失败，7 个跳过 | 日期选择器、时间选择器和 popconfirm 的失败和 2.7.8 一样，另外 select、checkbox / radio、dialog、tree-select 和分页还有 7 个失败（比如 select 的 placeholder 根本不会挡住对 input 的点击）。 |
 
 每个变化是从哪个版本开始的，方便你判断哪些说明适用于你的版本：
 
@@ -140,4 +146,4 @@ Vue 3.5.43、@playwright/test 1.63.0（Chromium headless shell）、Vite 8.3.3�
 
 ## 翻译
 
-非英文的 README 是机器辅助翻译的。以英文 README 为准。欢迎通过 pull request 提交修正。
+以英文 README 为准。翻译有问题的话，欢迎提 pull request 修正。

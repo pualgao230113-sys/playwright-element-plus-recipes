@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { narrow } from '../narrow'
 import { ref } from 'vue'
+import Readout from '../components/Readout.vue'
 
 const quantity = ref<number | undefined>(1)
 const price = ref<number | undefined>(2.5)
@@ -8,19 +10,27 @@ const changes = ref(0)
 </script>
 
 <template>
-  <h2>Input number</h2>
-  <el-form label-width="120px" style="max-width: 520px">
-    <el-form-item label="Quantity">
-      <el-input-number v-model="quantity" :min="1" :max="10" @change="changes++" />
-      <div class="out">model: <span data-testid="quantity-value">{{ quantity ?? '(empty)' }}</span>, change events: <span data-testid="quantity-changes">{{ changes }}</span></div>
-    </el-form-item>
-    <el-form-item label="Price">
-      <el-input-number v-model="price" :precision="2" :step="0.1" :min="0" />
-      <div class="out">model: <span data-testid="price-value">{{ price ?? '(empty)' }}</span></div>
-    </el-form-item>
-    <el-form-item label="Boxes of 6">
-      <el-input-number v-model="boxes" :step="6" step-strictly :min="0" />
-      <div class="out">model: <span data-testid="boxes-value">{{ boxes ?? '(empty)' }}</span></div>
-    </el-form-item>
-  </el-form>
+  <section>
+    <el-form label-width="120px" :label-position="narrow ? 'top' : 'right'">
+      <el-form-item label="Quantity">
+        <Readout :expected="quantity === undefined || quantity === null ? '' : String(quantity)" :stored-key="quantity">
+          <el-input-number v-model="quantity" :min="1" :max="10" @change="changes++" />
+          <template #stored><span data-testid="quantity-value">{{ quantity ?? '(empty)' }}</span></template>
+          <template #extra>change events: <span data-testid="quantity-changes">{{ changes }}</span></template>
+        </Readout>
+      </el-form-item>
+      <el-form-item label="Price">
+        <Readout :expected="price === undefined || price === null ? '' : price.toFixed(2)" :stored-key="price">
+          <el-input-number v-model="price" :precision="2" :step="0.1" :min="0" />
+          <template #stored><span data-testid="price-value">{{ price ?? '(empty)' }}</span></template>
+        </Readout>
+      </el-form-item>
+      <el-form-item label="Boxes of 6">
+        <Readout :expected="boxes === undefined || boxes === null ? '' : String(boxes)" :stored-key="boxes">
+          <el-input-number v-model="boxes" :step="6" step-strictly :min="0" />
+          <template #stored><span data-testid="boxes-value">{{ boxes ?? '(empty)' }}</span></template>
+        </Readout>
+      </el-form-item>
+    </el-form>
+  </section>
 </template>

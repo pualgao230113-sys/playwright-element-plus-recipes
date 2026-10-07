@@ -5,8 +5,8 @@ const last = ref('(none)')
 </script>
 
 <template>
-  <h2>Dropdown</h2>
-  <section style="display: flex; gap: 48px; align-items: center">
+  <section>
+  <div style="display: flex; flex-wrap: wrap; gap: 16px 48px; align-items: center">
     <el-dropdown @command="(c: string) => (last = `hover: ${c}`)">
       <el-button>Shelf actions</el-button>
       <template #dropdown>
@@ -36,6 +36,7 @@ const last = ref('(none)')
         </el-dropdown-menu>
       </template>
     </el-dropdown>
-  </section>
+  </div>
   <div class="out">last command: <span data-testid="last">{{ last }}</span></div>
+  </section>
 </template>

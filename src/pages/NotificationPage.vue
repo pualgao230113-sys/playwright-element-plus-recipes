@@ -13,7 +13,6 @@ function failed() {
 </script>
 
 <template>
-  <h2>Notification</h2>
   <section>
     <el-button type="primary" @click="done">Complete todo</el-button>
     <el-button @click="reminder">Remind me</el-button>

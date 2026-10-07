@@ -1,8 +1,8 @@
 {
-  "extends": "./tsconfig.helpers.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "module": "CommonJS",
     "moduleResolution": "Node10",
-    "outDir": "dist-helpers/cjs"
+    "outDir": "dist/cjs"
   }
 }

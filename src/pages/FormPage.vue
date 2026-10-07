@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { narrow } from '../narrow'
 import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 
@@ -36,8 +37,8 @@ async function submit() {
 </script>
 
 <template>
-  <h2>Form validation</h2>
-  <el-form ref="formRef" :model="form" :rules="rules" label-width="140px" style="max-width: 480px">
+  <section>
+  <el-form ref="formRef" :model="form" :rules="rules" label-width="140px" :label-position="narrow ? 'top' : 'right'" style="max-width: 520px">
     <el-form-item label="Username" prop="username">
       <el-input v-model="form.username" />
     </el-form-item>
@@ -53,5 +54,6 @@ async function submit() {
       <el-button type="primary" @click="submit">Create account</el-button>
     </el-form-item>
   </el-form>
-  <div class="out" data-testid="form-result">{{ result || '(not submitted)' }}</div>
+  <div class="out">result: <span data-testid="form-result">{{ result || '(not submitted)' }}</span></div>
+  </section>
 </template>

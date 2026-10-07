@@ -13,7 +13,7 @@ const ReviewsPane = {
 </script>
 
 <template>
-  <h2>Tabs</h2>
+  <section>
   <el-tabs v-model="active" aria-label="Book sections">
     <el-tab-pane label="Summary" name="summary">A desert planet and a spice everyone wants.</el-tab-pane>
     <el-tab-pane label="Summary notes" name="notes">Notes on the summary.</el-tab-pane>
@@ -22,4 +22,5 @@ const ReviewsPane = {
   </el-tabs>
   <div class="out">active: <span data-testid="active-tab">{{ active }}</span></div>
   <div class="out">loaded: <span data-testid="loads">{{ loads.join(', ') || '(none)' }}</span></div>
+  </section>
 </template>

@@ -89,6 +89,8 @@ test('pick an option by exact name from the right listbox', async ({ page }) => 
 test('filterable select: type, then pick from the filtered list', async ({ page }) => {
   const listbox = await openSelect(page, 'Filtered fruit')
   await page.getByRole('combobox', { name: 'Filtered fruit', exact: true }).fill('ap')
+  // The typed text is only a filter: v-model stays empty until you pick.
+  await expect(page.getByTestId('filtered-fruit-value')).toHaveText('(none)')
 
   // Filtering hides non-matching options; role queries only see visible ones.
   await expect(listbox.getByRole('option')).toHaveText(['Apple', 'Apricot', 'Grape', 'Pineapple'])

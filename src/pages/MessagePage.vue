@@ -22,7 +22,6 @@ function quietAndCorrect() {
 </script>
 
 <template>
-  <h2>Message (toasts)</h2>
   <section>
     <el-button type="primary" @click="save">Save book</el-button>
     <el-button @click="remove">Delete book</el-button>

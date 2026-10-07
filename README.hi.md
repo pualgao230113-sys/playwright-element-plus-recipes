@@ -8,7 +8,7 @@ Element Plus components कुछ ऐसी चीज़ें करते ह�
 
 <p align="center"><img src="docs/demo.gif" alt="Playwright demo app चला रहा है: select से option चुनना, toasts का जमा होना, date चुनना" width="720"></p>
 
-Live demo: <https://pualgao230113-sys.github.io/playwright-element-plus-recipes/> (अभी live नहीं है: repo public होने और GitHub Pages चालू होने के बाद यह चालू होगा)।
+Live demo: <https://pualgao230113-sys.github.io/playwright-element-plus-recipes/>
 
 Element Plus या Playwright से इसका कोई संबंध नहीं है। ये नाम सिर्फ़ यह बताने के लिए इस्तेमाल हुए हैं कि project क्या test करता है।
 
@@ -17,7 +17,7 @@ Element Plus या Playwright से इसका कोई संबंध न
 ```bash
 git clone https://github.com/pualgao230113-sys/playwright-element-plus-recipes.git
 cd playwright-element-plus-recipes
-npm install
+npm ci
 npx playwright install chromium   # first time only
 npm test                          # starts the demo app on :5179 and runs every recipe
 ```
@@ -26,33 +26,22 @@ npm test                          # starts the demo app on :5179 and runs every 
 |---|---|
 | `npm run dev` | <http://localhost:5179> पर demo app, हर recipe के लिए एक page |
 | `npm test` | पूरा Playwright suite (headless Chromium, 1 worker) |
-| `npm run test:ui` | Playwright UI mode, किसी एक recipe को step-by-step देखने के लिए अच्छा |
+| `npm run test:ui` | Playwright UI mode, किसी एक recipe को step-by-step देखने के लिए |
 | `npm run typecheck` | App, specs और helpers को type-check करता है |
 | `npm run build` | Demo app को `dist/` में build करता है |
-| `npm run build:helpers` | Helpers को `dist-helpers/` में build करता है |
+| `npm run build:helpers` | `playwright-element-plus` package को `packages/playwright-element-plus/dist/` में build करता है |
 
 ## Helpers को अपने project में इस्तेमाल करें
 
-GitHub से install करें। यह npm पर नहीं है।
-
 ```bash
-npm i -D github:pualgao230113-sys/playwright-element-plus-recipes
+npm i -D playwright-element-plus
 ```
 
-npm install के दौरान helpers build करता है (package की `prepare` script), इसलिए पहली बार install में लगभग एक मिनट लगता है। आपके project में `@playwright/test` पहले से होना चाहिए; यह peer dependency है, 1.63 के साथ test किया गया है।
-
-pnpm dependencies की build scripts को block करता है, इसलिए पहले `pnpm-workspace.yaml` में इसे allow करें। pnpm 11 के साथ:
-
-```yaml
-allowBuilds:
-  playwright-element-plus-recipes: true
-```
-
-pnpm 10 के साथ, pnpm अपनी `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` error में जो entry print करता है, उसे `onlyBuiltDependencies` में जोड़ें। Git dependency के लिए इसमें commit शामिल होता है, इसलिए update करने पर यह बदल जाती है।
+आपके project में `@playwright/test` पहले से होना चाहिए; यह peer dependency है, 1.63 के साथ test किया गया है।
 
 ```ts
 import { expect, test } from '@playwright/test'
-import { drainMessages, message, selectOption } from 'playwright-element-plus-recipes'
+import { drainMessages, message, selectOption } from 'playwright-element-plus'
 
 test('save a fruit', async ({ page }) => {
   await page.goto('/fruits')
@@ -63,7 +52,24 @@ test('save a fruit', async ({ page }) => {
 })
 ```
 
-यह ESM और CommonJS दोनों तरह के test projects में चलता है, और types साथ में आते हैं। हर helper एक example के साथ [docs/helpers.md](docs/helpers.md) में दिया गया है। अगर आप dependency नहीं जोड़ना चाहते, तो [`tests/helpers/element-plus.ts`](tests/helpers/element-plus.ts) को अपने project में copy कर लें। यह सिर्फ़ `@playwright/test` import करता है।
+यह ESM और CommonJS दोनों तरह के test projects में चलता है, और types साथ में आते हैं। हर helper एक example के साथ [docs/helpers.md](docs/helpers.md) में दिया गया है। Package का अपना README [packages/playwright-element-plus/README.md](packages/playwright-element-plus/README.md) है। अगर आप dependency नहीं जोड़ना चाहते, तो [`packages/playwright-element-plus/src/index.ts`](packages/playwright-element-plus/src/index.ts) को अपने project में copy कर लें। यह सिर्फ़ `@playwright/test` import करता है।
+
+### इसकी जगह GitHub से install करें
+
+```bash
+npm i -D github:pualgao230113-sys/playwright-element-plus-recipes
+```
+
+यह repo को `playwright-element-plus-recipes` नाम से install करता है, इसलिए import `'playwright-element-plus-recipes'` से करें। npm install के दौरान helpers build करता है (repo की `prepare` script), इसलिए पहली बार install में लगभग एक मिनट लगता है।
+
+pnpm dependencies की build scripts को block करता है, इसलिए पहले `pnpm-workspace.yaml` में इसे allow करें। pnpm 11 के साथ:
+
+```yaml
+allowBuilds:
+  playwright-element-plus-recipes: true
+```
+
+pnpm 10 के साथ, pnpm अपनी `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` error में जो entry print करता है, उसे `onlyBuiltDependencies` में जोड़ें। Git dependency के लिए इसमें commit शामिल होता है, इसलिए update करने पर यह बदल जाती है।
 
 ## Recipes
 
@@ -99,15 +105,15 @@ test('save a fruit', async ({ page }) => {
 
 Vue 3.5.43, @playwright/test 1.63.0 (Chromium headless shell), Vite 8.3.3, Node.js 24.
 
-नीचे दिया हर Element Plus version अलग से install किया गया और उस पर पूरा suite चलाया गया (109 tests)। जहाँ versions के बीच कोई behaviour बदला, वहाँ spec reason में version लिखकर skip होता है, या हर version के लिए सही value assert करता है। CI तीनों supported versions चलाता है।
+नीचे दिया हर Element Plus version अलग से install किया गया और उस पर पूरा suite चलाया गया (111 tests)। जहाँ versions के बीच कोई behaviour बदला, वहाँ spec reason में version लिखकर skip होता है, या हर version के लिए सही value assert करता है। CI तीनों supported versions चलाता है।
 
 | Element Plus | नतीजा | Notes |
 |---|---|---|
-| 2.14.7 | 109 passed | लिखते समय latest। सभी recipes लागू होती हैं। |
-| 2.13.7 | 107 passed, 2 skipped | अभी ढीली date parsing नहीं (04), input counter पर `role="status"` नहीं (08)। |
-| 2.9.11 | 102 passed, 7 skipped | साथ ही: tables में "Sort by" button या `aria-sort` नहीं (06), और autocomplete का `aria-controls` उसकी listbox की ओर point नहीं करता (12)। |
-| 2.7.8 | Supported नहीं: 10 failed | Date और time picker inputs का कोई `combobox` role नहीं है, इसलिए उनके helpers को कुछ नहीं मिलता। |
-| 2.4.4 | Supported नहीं: 16 failed | 2.7.8 जैसा ही, साथ में select, checkbox / radio, dialog और tree-select में 6 और failures (जैसे select का placeholder input पर click को नहीं रोकता)। |
+| 2.14.7 | 111 passed | सभी recipes लागू होती हैं। |
+| 2.13.7 | 109 passed, 2 skipped | अभी ढीली date parsing नहीं (04), input counter पर `role="status"` नहीं (08)। |
+| 2.9.11 | 104 passed, 7 skipped | साथ ही: tables में "Sort by" button या `aria-sort` नहीं (06), और autocomplete का `aria-controls` उसकी listbox की ओर point नहीं करता (12)। |
+| 2.7.8 | Supported नहीं: 13 failed, 7 skipped | Date और time picker inputs का कोई `combobox` role नहीं है, इसलिए उनके helpers को कुछ नहीं मिलता। साथ ही, filterable select का placeholder अब भी उसके input पर click को रोकता है (01), और बाहर click करने से popconfirm बंद नहीं होता (19)। |
+| 2.4.4 | Supported नहीं: 19 failed, 7 skipped | 2.7.8 जैसी ही date picker, time picker और popconfirm failures, साथ में select, checkbox / radio, dialog, tree-select और pagination में 7 और (जैसे select का placeholder उसके input पर click को बिल्कुल नहीं रोकता)। |
 
 हर बदलाव कहाँ हुआ, ताकि आप जान सकें कि आपके version पर कौन से notes लागू होते हैं:
 
@@ -140,4 +146,4 @@ Vue 3.5.43, @playwright/test 1.63.0 (Chromium headless shell), Vite 8.3.3, Node.
 
 ## अनुवाद
 
-English के अलावा बाकी READMEs मशीन की मदद से अनुवादित हैं। English README ही reference है। सुधार pull requests के रूप में भेजे जा सकते हैं।
+English README ही reference है। अनुवादों में सुधार pull requests के रूप में भेजे जा सकते हैं।

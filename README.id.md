@@ -8,7 +8,7 @@ Komponen Element Plus melakukan hal-hal yang membuat tes Playwright rusak dengan
 
 <p align="center"><img src="docs/demo.gif" alt="Playwright menjalankan aplikasi demo: memilih dari select, toast yang menumpuk, memilih tanggal" width="720"></p>
 
-Demo langsung: <https://pualgao230113-sys.github.io/playwright-element-plus-recipes/> (belum aktif: akan tayang setelah repo dibuat publik dan GitHub Pages dinyalakan).
+Demo langsung: <https://pualgao230113-sys.github.io/playwright-element-plus-recipes/>
 
 Tidak berafiliasi dengan Element Plus atau Playwright. Nama-nama tersebut hanya dipakai untuk menjelaskan apa yang diuji oleh proyek ini.
 
@@ -17,7 +17,7 @@ Tidak berafiliasi dengan Element Plus atau Playwright. Nama-nama tersebut hanya 
 ```bash
 git clone https://github.com/pualgao230113-sys/playwright-element-plus-recipes.git
 cd playwright-element-plus-recipes
-npm install
+npm ci
 npx playwright install chromium   # first time only
 npm test                          # starts the demo app on :5179 and runs every recipe
 ```
@@ -26,33 +26,22 @@ npm test                          # starts the demo app on :5179 and runs every 
 |---|---|
 | `npm run dev` | Aplikasi demo di <http://localhost:5179>, satu halaman per resep |
 | `npm test` | Seluruh suite Playwright (headless Chromium, 1 worker) |
-| `npm run test:ui` | Mode UI Playwright, praktis untuk menelusuri satu resep langkah demi langkah |
+| `npm run test:ui` | Mode UI Playwright, untuk menelusuri satu resep langkah demi langkah |
 | `npm run typecheck` | Memeriksa tipe untuk aplikasi, spec, dan helper |
 | `npm run build` | Mem-build aplikasi demo ke `dist/` |
-| `npm run build:helpers` | Mem-build helper ke `dist-helpers/` |
+| `npm run build:helpers` | Mem-build paket `playwright-element-plus` ke `packages/playwright-element-plus/dist/` |
 
 ## Pakai helper di proyek Anda sendiri
 
-Instal dari GitHub. Paket ini tidak ada di npm.
-
 ```bash
-npm i -D github:pualgao230113-sys/playwright-element-plus-recipes
+npm i -D playwright-element-plus
 ```
 
-npm mem-build helper saat instalasi (lewat script `prepare` milik paket), jadi instalasi pertama butuh sekitar satu menit. Proyek Anda harus sudah punya `@playwright/test`; paket itu adalah peer dependency, diuji dengan 1.63.
-
-pnpm memblokir build script milik dependency, jadi izinkan paket ini dulu di `pnpm-workspace.yaml`. Dengan pnpm 11:
-
-```yaml
-allowBuilds:
-  playwright-element-plus-recipes: true
-```
-
-Dengan pnpm 10, tambahkan entri yang dicetak pnpm di error `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` ke `onlyBuiltDependencies`. Untuk git dependency, entri itu menyertakan commit-nya, jadi entrinya berubah setiap kali Anda update.
+Proyek Anda harus sudah punya `@playwright/test`; paket itu adalah peer dependency, diuji dengan 1.63.
 
 ```ts
 import { expect, test } from '@playwright/test'
-import { drainMessages, message, selectOption } from 'playwright-element-plus-recipes'
+import { drainMessages, message, selectOption } from 'playwright-element-plus'
 
 test('save a fruit', async ({ page }) => {
   await page.goto('/fruits')
@@ -63,7 +52,24 @@ test('save a fruit', async ({ page }) => {
 })
 ```
 
-Paket ini bisa dipakai dari proyek tes ESM maupun CommonJS, dan tipenya sudah disertakan. Semua helper tercantum beserta contohnya di [docs/helpers.md](docs/helpers.md). Jika tidak ingin menambah dependency, salin [`tests/helpers/element-plus.ts`](tests/helpers/element-plus.ts) ke proyek Anda. File itu hanya meng-import `@playwright/test`.
+Paket ini bisa dipakai dari proyek tes ESM maupun CommonJS, dan tipenya sudah disertakan. Semua helper tercantum beserta contohnya di [docs/helpers.md](docs/helpers.md). README milik paket ini ada di [packages/playwright-element-plus/README.md](packages/playwright-element-plus/README.md). Jika tidak ingin menambah dependency, salin [`packages/playwright-element-plus/src/index.ts`](packages/playwright-element-plus/src/index.ts) ke proyek Anda. File itu hanya meng-import `@playwright/test`.
+
+### Instal dari GitHub sebagai gantinya
+
+```bash
+npm i -D github:pualgao230113-sys/playwright-element-plus-recipes
+```
+
+Cara ini menginstal repo dengan nama `playwright-element-plus-recipes`, jadi import dari `'playwright-element-plus-recipes'` sebagai gantinya. npm mem-build helper saat instalasi (lewat script `prepare` milik repo), jadi instalasi pertama butuh sekitar satu menit.
+
+pnpm memblokir build script milik dependency, jadi izinkan paket ini dulu di `pnpm-workspace.yaml`. Dengan pnpm 11:
+
+```yaml
+allowBuilds:
+  playwright-element-plus-recipes: true
+```
+
+Dengan pnpm 10, tambahkan entri yang dicetak pnpm di error `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` ke `onlyBuiltDependencies`. Untuk git dependency, entri itu menyertakan commit-nya, jadi entrinya berubah setiap kali Anda update.
 
 ## Resep
 
@@ -99,15 +105,15 @@ Ada satu hal yang muncul di hampir setiap halaman, dan itu dari Playwright, buka
 
 Vue 3.5.43, @playwright/test 1.63.0 (Chromium headless shell), Vite 8.3.3, Node.js 24.
 
-Setiap versi Element Plus di bawah ini diinstal sendiri-sendiri dan seluruh suite dijalankan terhadapnya (109 tes). Jika suatu perilaku berubah antarversi, spec melakukan skip dengan versi disebut di alasannya, atau meng-assert nilai yang benar untuk tiap versi. CI menjalankan tiga versi yang didukung.
+Setiap versi Element Plus di bawah ini diinstal sendiri-sendiri dan seluruh suite dijalankan terhadapnya (111 tes). Jika suatu perilaku berubah antarversi, spec melakukan skip dengan versi disebut di alasannya, atau meng-assert nilai yang benar untuk tiap versi. CI menjalankan tiga versi yang didukung.
 
 | Element Plus | Hasil | Catatan |
 |---|---|---|
-| 2.14.7 | 109 lulus | Terbaru saat tulisan ini dibuat. Semua resep berlaku. |
-| 2.13.7 | 107 lulus, 2 di-skip | Belum ada parsing tanggal yang longgar (04), belum ada `role="status"` pada penghitung input (08). |
-| 2.9.11 | 102 lulus, 7 di-skip | Selain itu: belum ada tombol "Sort by" atau `aria-sort` di tabel (06), dan `aria-controls` milik autocomplete tidak menunjuk ke listbox-nya (12). |
-| 2.7.8 | Tidak didukung: 10 gagal | Input date picker dan time picker tidak punya role `combobox`, jadi helper-nya tidak menemukan apa pun. |
-| 2.4.4 | Tidak didukung: 16 gagal | Sama seperti 2.7.8, ditambah 6 kegagalan lain di select, checkbox / radio, dialog, dan tree-select (misalnya placeholder select tidak menghalangi klik ke input). |
+| 2.14.7 | 111 lulus | Semua resep berlaku. |
+| 2.13.7 | 109 lulus, 2 di-skip | Belum ada parsing tanggal yang longgar (04), belum ada `role="status"` pada penghitung input (08). |
+| 2.9.11 | 104 lulus, 7 di-skip | Selain itu: belum ada tombol "Sort by" atau `aria-sort` di tabel (06), dan `aria-controls` milik autocomplete tidak menunjuk ke listbox-nya (12). |
+| 2.7.8 | Tidak didukung: 13 gagal, 7 di-skip | Input date picker dan time picker tidak punya role `combobox`, jadi helper-nya tidak menemukan apa pun. Selain itu, placeholder pada select yang filterable masih menghalangi klik ke input-nya (01), dan klik di luar tidak menutup popconfirm (19). |
+| 2.4.4 | Tidak didukung: 19 gagal, 7 di-skip | Kegagalan date picker, time picker, dan popconfirm yang sama seperti 2.7.8, ditambah 7 lagi di select, checkbox / radio, dialog, tree-select, dan pagination (misalnya, placeholder select sama sekali tidak menghalangi klik ke input-nya). |
 
 Kapan setiap perubahan terjadi, supaya Anda tahu catatan mana yang berlaku untuk versi Anda:
 
@@ -140,4 +146,4 @@ Lihat [CONTRIBUTING.md](CONTRIBUTING.md). Aturan utamanya: sebuah jebakan hanya 
 
 ## Terjemahan
 
-README selain bahasa Inggris dibuat dengan bantuan mesin. README bahasa Inggris adalah acuannya. Perbaikan dipersilakan lewat pull request.
+README bahasa Inggris adalah acuannya. Perbaikan untuk terjemahan dipersilakan lewat pull request.

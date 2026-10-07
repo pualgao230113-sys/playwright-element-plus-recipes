@@ -7,9 +7,9 @@
     "skipLibCheck": true,
     "declaration": true,
     "sourceMap": false,
-    "rootDir": "tests/helpers",
-    "outDir": "dist-helpers/esm",
+    "rootDir": "src",
+    "outDir": "dist/esm",
     "types": ["node"]
   },
-  "files": ["tests/helpers/element-plus.ts"]
+  "files": ["src/index.ts"]
 }

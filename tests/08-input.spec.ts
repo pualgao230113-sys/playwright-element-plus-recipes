@@ -73,4 +73,11 @@ test("fill('') is not the same as clearing", async ({ page }) => {
   await expect(page.getByTestId('search-value')).toHaveText('(empty)')
   // The value is empty, but the app's @clear handler never ran.
   await expect(page.getByTestId('clear-count')).toHaveText('0')
+
+  // Same when a user selects the text and deletes it.
+  await search.fill('kiwi')
+  await search.press('ControlOrMeta+a')
+  await search.press('Backspace')
+  await expect(search).toHaveValue('')
+  await expect(page.getByTestId('clear-count')).toHaveText('0')
 })

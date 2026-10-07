@@ -37,7 +37,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <h2>Table</h2>
+  <section>
   <el-input v-model="query" placeholder="Filter by title" aria-label="Filter by title" style="width: 240px; margin-bottom: 12px" clearable />
   <el-table v-loading="loading" :data="visible" style="width: 700px" empty-text="No books match" data-testid="books-table">
     <el-table-column prop="title" label="Title" width="150" fixed="left" class-name="col-title" />
@@ -52,5 +52,6 @@ onMounted(() => {
       </template>
     </el-table-column>
   </el-table>
-  <div class="out" data-testid="borrowed">{{ borrowed || '(nothing borrowed)' }}</div>
+  <div class="out">borrowed: <span data-testid="borrowed">{{ borrowed || '(nothing borrowed)' }}</span></div>
+  </section>
 </template>

@@ -8,7 +8,7 @@ Element Plus 컴포넌트에는 Playwright 테스트를 헷갈리는 방식으�
 
 <p align="center"><img src="docs/demo.gif" alt="데모 앱을 조작하는 Playwright: select에서 고르기, 토스트 쌓기, 날짜 고르기" width="720"></p>
 
-라이브 데모: <https://pualgao230113-sys.github.io/playwright-element-plus-recipes/> (아직 공개 전입니다. 저장소를 public으로 바꾸고 GitHub Pages를 켜면 올라갑니다.)
+라이브 데모: <https://pualgao230113-sys.github.io/playwright-element-plus-recipes/>
 
 Element Plus, Playwright와는 관련이 없습니다. 이름은 이 프로젝트가 무엇을 테스트하는지 설명하는 데만 씁니다.
 
@@ -17,7 +17,7 @@ Element Plus, Playwright와는 관련이 없습니다. 이름은 이 프로젝�
 ```bash
 git clone https://github.com/pualgao230113-sys/playwright-element-plus-recipes.git
 cd playwright-element-plus-recipes
-npm install
+npm ci
 npx playwright install chromium   # first time only
 npm test                          # starts the demo app on :5179 and runs every recipe
 ```
@@ -26,33 +26,22 @@ npm test                          # starts the demo app on :5179 and runs every 
 |---|---|
 | `npm run dev` | <http://localhost:5179>에서 데모 앱 실행, 레시피마다 페이지 하나 |
 | `npm test` | 전체 Playwright 스위트 (headless Chromium, worker 1개) |
-| `npm run test:ui` | Playwright UI 모드, 레시피 하나를 단계별로 실행해 볼 때 편함 |
+| `npm run test:ui` | Playwright UI 모드, 레시피 하나를 단계별로 실행해 볼 때 사용 |
 | `npm run typecheck` | 앱, spec, 헬퍼의 타입 검사 |
 | `npm run build` | 데모 앱을 `dist/`에 빌드 |
-| `npm run build:helpers` | 헬퍼를 `dist-helpers/`에 빌드 |
+| `npm run build:helpers` | `playwright-element-plus` 패키지를 `packages/playwright-element-plus/dist/`에 빌드 |
 
 ## 내 프로젝트에서 헬퍼 쓰기
 
-GitHub에서 설치합니다. npm에는 올라가 있지 않습니다.
-
 ```bash
-npm i -D github:pualgao230113-sys/playwright-element-plus-recipes
+npm i -D playwright-element-plus
 ```
 
-설치할 때 npm이 헬퍼를 빌드하기 때문에(패키지의 `prepare` 스크립트) 첫 설치는 1분 정도 걸립니다. 프로젝트에 `@playwright/test`가 이미 있어야 합니다. peer dependency이고, 1.63으로 테스트했습니다.
-
-pnpm은 의존성의 빌드 스크립트를 막기 때문에, 먼저 `pnpm-workspace.yaml`에서 이 패키지를 허용해야 합니다. pnpm 11에서는 이렇게 합니다:
-
-```yaml
-allowBuilds:
-  playwright-element-plus-recipes: true
-```
-
-pnpm 10에서는 pnpm이 `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` 오류에 출력하는 항목을 `onlyBuiltDependencies`에 추가합니다. git 의존성이면 이 항목에 커밋이 들어가기 때문에, 업데이트할 때마다 바뀝니다.
+프로젝트에 `@playwright/test`가 이미 있어야 합니다. peer dependency이고, 1.63으로 테스트했습니다.
 
 ```ts
 import { expect, test } from '@playwright/test'
-import { drainMessages, message, selectOption } from 'playwright-element-plus-recipes'
+import { drainMessages, message, selectOption } from 'playwright-element-plus'
 
 test('save a fruit', async ({ page }) => {
   await page.goto('/fruits')
@@ -63,7 +52,24 @@ test('save a fruit', async ({ page }) => {
 })
 ```
 
-ESM과 CommonJS 테스트 프로젝트 둘 다에서 쓸 수 있고, 타입도 함께 들어 있습니다. 모든 헬퍼는 [docs/helpers.md](docs/helpers.md)에 예제와 함께 정리돼 있습니다. 의존성을 추가하고 싶지 않다면 [`tests/helpers/element-plus.ts`](tests/helpers/element-plus.ts)를 프로젝트에 복사하세요. 이 파일은 `@playwright/test`만 import합니다.
+ESM과 CommonJS 테스트 프로젝트 둘 다에서 쓸 수 있고, 타입도 함께 들어 있습니다. 모든 헬퍼는 [docs/helpers.md](docs/helpers.md)에 예제와 함께 정리돼 있습니다. 패키지 자체의 README는 [packages/playwright-element-plus/README.md](packages/playwright-element-plus/README.md)입니다. 의존성을 추가하고 싶지 않다면 [`packages/playwright-element-plus/src/index.ts`](packages/playwright-element-plus/src/index.ts)를 프로젝트에 복사하세요. 이 파일은 `@playwright/test`만 import합니다.
+
+### 대신 GitHub에서 설치하기
+
+```bash
+npm i -D github:pualgao230113-sys/playwright-element-plus-recipes
+```
+
+이렇게 하면 저장소가 `playwright-element-plus-recipes`라는 이름으로 설치되므로, import도 `'playwright-element-plus-recipes'`에서 하세요. 설치할 때 npm이 헬퍼를 빌드하기 때문에(저장소의 `prepare` 스크립트) 첫 설치는 1분 정도 걸립니다.
+
+pnpm은 의존성의 빌드 스크립트를 막기 때문에, 먼저 `pnpm-workspace.yaml`에서 이 패키지를 허용해야 합니다. pnpm 11에서는 이렇게 합니다:
+
+```yaml
+allowBuilds:
+  playwright-element-plus-recipes: true
+```
+
+pnpm 10에서는 pnpm이 `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` 오류에 출력하는 항목을 `onlyBuiltDependencies`에 추가합니다. git 의존성이면 이 항목에 커밋이 들어가기 때문에, 업데이트할 때마다 바뀝니다.
 
 ## 레시피
 
@@ -99,15 +105,15 @@ ESM과 CommonJS 테스트 프로젝트 둘 다에서 쓸 수 있고, 타입도 �
 
 Vue 3.5.43, @playwright/test 1.63.0 (Chromium headless shell), Vite 8.3.3, Node.js 24.
 
-아래 Element Plus 버전을 하나씩 따로 설치하고, 각각에 대해 전체 스위트(109개 테스트)를 돌렸습니다. 버전에 따라 동작이 바뀐 곳에서는 spec이 이유에 버전을 적고 skip하거나, 버전별로 맞는 값을 검증합니다. CI는 지원하는 세 버전을 돌립니다.
+아래 Element Plus 버전을 하나씩 따로 설치하고, 각각에 대해 전체 스위트(111개 테스트)를 돌렸습니다. 버전에 따라 동작이 바뀐 곳에서는 spec이 이유에 버전을 적고 skip하거나, 버전별로 맞는 값을 검증합니다. CI는 지원하는 세 버전을 돌립니다.
 
 | Element Plus | 결과 | 비고 |
 |---|---|---|
-| 2.14.7 | 109개 통과 | 작성 시점의 최신 버전. 모든 레시피가 해당됩니다. |
-| 2.13.7 | 107개 통과, 2개 skip | 느슨한 날짜 파싱이 아직 없음(04), input 카운터에 `role="status"` 없음(08). |
-| 2.9.11 | 102개 통과, 7개 skip | 추가로 테이블에 "Sort by" 버튼과 `aria-sort`가 없고(06), autocomplete의 `aria-controls`가 listbox를 가리키지 않음(12). |
-| 2.7.8 | 지원 안 함: 10개 실패 | 날짜/시간 picker input에 `combobox` role이 없어서 헬퍼가 아무것도 찾지 못합니다. |
-| 2.4.4 | 지원 안 함: 16개 실패 | 2.7.8과 같은 문제에 더해 select, checkbox / radio, dialog, tree-select에서 6개가 더 실패합니다(예: select의 placeholder가 input 클릭을 막지 않습니다). |
+| 2.14.7 | 111개 통과 | 모든 레시피가 해당됩니다. |
+| 2.13.7 | 109개 통과, 2개 skip | 느슨한 날짜 파싱이 아직 없음(04), input 카운터에 `role="status"` 없음(08). |
+| 2.9.11 | 104개 통과, 7개 skip | 추가로 테이블에 "Sort by" 버튼과 `aria-sort`가 없고(06), autocomplete의 `aria-controls`가 listbox를 가리키지 않음(12). |
+| 2.7.8 | 지원 안 함: 13개 실패, 7개 skip | 날짜/시간 picker input에 `combobox` role이 없어서 헬퍼가 아무것도 찾지 못합니다. 또한 filterable select의 placeholder가 아직 input 클릭을 막고(01), 바깥을 클릭해도 popconfirm이 닫히지 않습니다(19). |
+| 2.4.4 | 지원 안 함: 19개 실패, 7개 skip | 2.7.8과 같은 날짜 picker, 시간 picker, popconfirm 실패에 더해 select, checkbox / radio, dialog, tree-select, pagination에서 7개가 더 실패합니다(예를 들어 select의 placeholder가 input 클릭을 전혀 막지 않습니다). |
 
 각 변경이 어느 버전에서 생겼는지 정리했습니다. 내 버전에 어떤 비고가 해당되는지 판단할 때 쓰세요.
 
@@ -140,4 +146,4 @@ Vue 3.5.43, @playwright/test 1.63.0 (Chromium headless shell), Vite 8.3.3, Node.
 
 ## 번역
 
-영어가 아닌 README는 기계 번역의 도움을 받아 만들었습니다. 기준은 영어 README입니다. 수정은 pull request로 보내 주시면 환영합니다.
+기준은 영어 README입니다. 번역 수정은 pull request로 보내 주시면 환영합니다.

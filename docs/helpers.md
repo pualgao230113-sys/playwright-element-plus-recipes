@@ -1,9 +1,13 @@
 # Helpers
 
-All helpers live in one file, [`tests/helpers/element-plus.ts`](../tests/helpers/element-plus.ts). The recipes use it directly. Other projects can install the package and import the built copy:
+All helpers live in one file, [`packages/playwright-element-plus/src/index.ts`](../packages/playwright-element-plus/src/index.ts), the source of the `playwright-element-plus` npm package. The recipes import it through `tests/helpers/element-plus.ts`. In your own project, install the package and import from it:
+
+```bash
+npm i -D playwright-element-plus
+```
 
 ```ts
-import { selectOption, drainMessages } from 'playwright-element-plus-recipes'
+import { selectOption, drainMessages } from 'playwright-element-plus'
 ```
 
 Every helper takes Playwright's own `Page` and `Locator` objects. There are no fixtures to register.

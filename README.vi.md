@@ -8,7 +8,7 @@ Các component của Element Plus có những hành vi làm test Playwright hỏ
 
 <p align="center"><img src="docs/demo.gif" alt="Playwright điều khiển ứng dụng demo: chọn từ một select, các toast chồng lên nhau, chọn một ngày" width="720"></p>
 
-Demo trực tuyến: <https://pualgao230113-sys.github.io/playwright-element-plus-recipes/> (chưa chạy: trang sẽ lên khi repo được công khai và GitHub Pages được bật).
+Demo trực tuyến: <https://pualgao230113-sys.github.io/playwright-element-plus-recipes/>
 
 Dự án không liên kết với Element Plus hay Playwright. Các tên này chỉ được dùng để mô tả những gì dự án kiểm thử.
 
@@ -17,7 +17,7 @@ Dự án không liên kết với Element Plus hay Playwright. Các tên này ch
 ```bash
 git clone https://github.com/pualgao230113-sys/playwright-element-plus-recipes.git
 cd playwright-element-plus-recipes
-npm install
+npm ci
 npx playwright install chromium   # first time only
 npm test                          # starts the demo app on :5179 and runs every recipe
 ```
@@ -26,33 +26,22 @@ npm test                          # starts the demo app on :5179 and runs every 
 |---|---|
 | `npm run dev` | Ứng dụng demo tại <http://localhost:5179>, mỗi recipe một trang |
 | `npm test` | Toàn bộ bộ test Playwright (headless Chromium, 1 worker) |
-| `npm run test:ui` | Chế độ UI của Playwright, tiện để chạy từng bước một recipe |
+| `npm run test:ui` | Chế độ UI của Playwright, để chạy từng bước một recipe |
 | `npm run typecheck` | Kiểm tra kiểu cho ứng dụng, các spec và các helper |
 | `npm run build` | Build ứng dụng demo vào `dist/` |
-| `npm run build:helpers` | Build các helper vào `dist-helpers/` |
+| `npm run build:helpers` | Build package `playwright-element-plus` vào `packages/playwright-element-plus/dist/` |
 
 ## Dùng các helper trong dự án của bạn
 
-Cài từ GitHub. Package này không có trên npm.
-
 ```bash
-npm i -D github:pualgao230113-sys/playwright-element-plus-recipes
+npm i -D playwright-element-plus
 ```
 
-npm build các helper trong lúc cài (script `prepare` của package), nên lần cài đầu tiên mất khoảng một phút. Dự án của bạn cần có sẵn `@playwright/test`; đây là peer dependency, đã được test với 1.63.
-
-pnpm chặn build script của các dependency, nên trước hết hãy cho phép package này trong `pnpm-workspace.yaml`. Với pnpm 11:
-
-```yaml
-allowBuilds:
-  playwright-element-plus-recipes: true
-```
-
-Với pnpm 10, thêm vào `onlyBuiltDependencies` mục mà pnpm in ra trong lỗi `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED`. Với một git dependency, mục này có kèm commit, nên nó thay đổi mỗi khi bạn cập nhật.
+Dự án của bạn cần có sẵn `@playwright/test`; đây là peer dependency, đã được test với 1.63.
 
 ```ts
 import { expect, test } from '@playwright/test'
-import { drainMessages, message, selectOption } from 'playwright-element-plus-recipes'
+import { drainMessages, message, selectOption } from 'playwright-element-plus'
 
 test('save a fruit', async ({ page }) => {
   await page.goto('/fruits')
@@ -63,7 +52,24 @@ test('save a fruit', async ({ page }) => {
 })
 ```
 
-Package dùng được từ cả project test ESM lẫn CommonJS, và có kèm sẵn type. Mọi helper đều được liệt kê kèm ví dụ trong [docs/helpers.md](docs/helpers.md). Nếu không muốn thêm dependency, hãy chép [`tests/helpers/element-plus.ts`](tests/helpers/element-plus.ts) vào dự án của bạn. File này chỉ import `@playwright/test`.
+Package dùng được từ cả project test ESM lẫn CommonJS, và có kèm sẵn type. Mọi helper đều được liệt kê kèm ví dụ trong [docs/helpers.md](docs/helpers.md). README riêng của package nằm ở [packages/playwright-element-plus/README.md](packages/playwright-element-plus/README.md). Nếu không muốn thêm dependency, hãy chép [`packages/playwright-element-plus/src/index.ts`](packages/playwright-element-plus/src/index.ts) vào dự án của bạn. File này chỉ import `@playwright/test`.
+
+### Hoặc cài từ GitHub
+
+```bash
+npm i -D github:pualgao230113-sys/playwright-element-plus-recipes
+```
+
+Cách này cài repo dưới tên `playwright-element-plus-recipes`, nên hãy import từ `'playwright-element-plus-recipes'` thay vào đó. npm build các helper trong lúc cài (script `prepare` của repo), nên lần cài đầu tiên mất khoảng một phút.
+
+pnpm chặn build script của các dependency, nên trước hết hãy cho phép package này trong `pnpm-workspace.yaml`. Với pnpm 11:
+
+```yaml
+allowBuilds:
+  playwright-element-plus-recipes: true
+```
+
+Với pnpm 10, thêm vào `onlyBuiltDependencies` mục mà pnpm in ra trong lỗi `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED`. Với một git dependency, mục này có kèm commit, nên nó thay đổi mỗi khi bạn cập nhật.
 
 ## Recipe
 
@@ -99,15 +105,15 @@ Có một điều xuất hiện ở gần như mọi trang, và đó là do Play
 
 Vue 3.5.43, @playwright/test 1.63.0 (Chromium headless shell), Vite 8.3.3, Node.js 24.
 
-Mỗi phiên bản Element Plus dưới đây được cài riêng và chạy toàn bộ bộ test trên đó (109 test). Ở chỗ hành vi thay đổi giữa các phiên bản, spec sẽ skip với lý do ghi rõ phiên bản, hoặc assert đúng giá trị cho từng phiên bản. CI chạy ba phiên bản được hỗ trợ.
+Mỗi phiên bản Element Plus dưới đây được cài riêng và chạy toàn bộ bộ test trên đó (111 test). Ở chỗ hành vi thay đổi giữa các phiên bản, spec sẽ skip với lý do ghi rõ phiên bản, hoặc assert đúng giá trị cho từng phiên bản. CI chạy ba phiên bản được hỗ trợ.
 
 | Element Plus | Kết quả | Ghi chú |
 |---|---|---|
-| 2.14.7 | 109 pass | Mới nhất tại thời điểm viết. Mọi recipe đều áp dụng. |
-| 2.13.7 | 107 pass, 2 skip | Chưa có parse ngày dễ dãi (04), chưa có `role="status"` trên bộ đếm của input (08). |
-| 2.9.11 | 102 pass, 7 skip | Thêm nữa: chưa có nút "Sort by" hay `aria-sort` trong table (06), và `aria-controls` của autocomplete không trỏ tới listbox của nó (12). |
-| 2.7.8 | Không hỗ trợ: 10 fail | Input của date picker và time picker không có role `combobox`, nên các helper của chúng không tìm thấy gì. |
-| 2.4.4 | Không hỗ trợ: 16 fail | Giống 2.7.8, thêm 6 lỗi ở select, checkbox / radio, dialog và tree-select (ví dụ: placeholder của select không chặn click vào input). |
+| 2.14.7 | 111 pass | Mọi recipe đều áp dụng. |
+| 2.13.7 | 109 pass, 2 skip | Chưa có parse ngày dễ dãi (04), chưa có `role="status"` trên bộ đếm của input (08). |
+| 2.9.11 | 104 pass, 7 skip | Thêm nữa: chưa có nút "Sort by" hay `aria-sort` trong table (06), và `aria-controls` của autocomplete không trỏ tới listbox của nó (12). |
+| 2.7.8 | Không hỗ trợ: 13 fail, 7 skip | Input của date picker và time picker không có role `combobox`, nên các helper của chúng không tìm thấy gì. Ngoài ra, placeholder của select filterable vẫn chặn click vào input của nó (01), và click ra ngoài không đóng popconfirm (19). |
+| 2.4.4 | Không hỗ trợ: 19 fail, 7 skip | Cùng các lỗi ở date picker, time picker và popconfirm như 2.7.8, thêm 7 lỗi nữa ở select, checkbox / radio, dialog, tree-select và pagination (ví dụ: placeholder của select hoàn toàn không chặn click vào input của nó). |
 
 Mỗi thay đổi xuất hiện từ phiên bản nào, để bạn biết ghi chú nào áp dụng cho phiên bản của mình:
 
@@ -140,4 +146,4 @@ Xem [CONTRIBUTING.md](CONTRIBUTING.md). Quy tắc chính: một cái bẫy chỉ
 
 ## Bản dịch
 
-Các README không phải tiếng Anh được dịch với sự hỗ trợ của máy. README tiếng Anh là bản tham chiếu. Mọi chỉnh sửa đều được hoan nghênh qua pull request.
+README tiếng Anh là bản tham chiếu. Mọi chỉnh sửa cho các bản dịch đều được hoan nghênh qua pull request.

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import Readout from '../components/Readout.vue'
 
 const fruits = ['Apple', 'Apricot', 'Banana', 'Cherry', 'Grape', 'Mango', 'Pineapple']
 const books = ['Dune', 'Emma', 'Middlemarch', 'Moby-Dick', 'Neuromancer', 'Persuasion', 'Ulysses']
@@ -22,46 +23,52 @@ function searchBooks(query: string) {
 </script>
 
 <template>
-  <h2>Select</h2>
-
   <section>
     <h3>Basic</h3>
-    <el-select v-model="fruit" placeholder="Pick a fruit" aria-label="Fruit" style="width: 240px">
-      <el-option v-for="f in fruits" :key="f" :label="f" :value="f" />
-    </el-select>
-    <div class="out" data-testid="fruit-value">{{ fruit || '(none)' }}</div>
+    <Readout :expected="fruit" placeholder="Pick a fruit" :stored-key="fruit">
+      <el-select v-model="fruit" placeholder="Pick a fruit" aria-label="Fruit" style="width: 240px">
+        <el-option v-for="f in fruits" :key="f" :label="f" :value="f" />
+      </el-select>
+      <template #stored><span data-testid="fruit-value">{{ fruit || '(none)' }}</span></template>
+    </Readout>
   </section>
 
   <section>
     <h3>Filterable</h3>
-    <el-select v-model="filteredFruit" filterable placeholder="Type to filter" aria-label="Filtered fruit" style="width: 240px">
-      <el-option v-for="f in fruits" :key="f" :label="f" :value="f" />
-    </el-select>
-    <div class="out" data-testid="filtered-fruit-value">{{ filteredFruit || '(none)' }}</div>
+    <Readout :expected="filteredFruit" placeholder="Type to filter" :stored-key="filteredFruit">
+      <el-select v-model="filteredFruit" filterable placeholder="Type to filter" aria-label="Filtered fruit" style="width: 240px">
+        <el-option v-for="f in fruits" :key="f" :label="f" :value="f" />
+      </el-select>
+      <template #stored><span data-testid="filtered-fruit-value">{{ filteredFruit || '(none)' }}</span></template>
+    </Readout>
   </section>
 
   <section>
     <h3>Multiple</h3>
-    <el-select v-model="basket" multiple placeholder="Fill the basket" aria-label="Basket" style="width: 360px">
-      <el-option v-for="f in fruits" :key="f" :label="f" :value="f" />
-    </el-select>
-    <div class="out" data-testid="basket-value">{{ basket.join(', ') || '(empty)' }}</div>
+    <Readout :expected="basket.join(', ')" placeholder="Fill the basket" :stored-key="basket">
+      <el-select v-model="basket" multiple placeholder="Fill the basket" aria-label="Basket" style="width: 360px">
+        <el-option v-for="f in fruits" :key="f" :label="f" :value="f" />
+      </el-select>
+      <template #stored><span data-testid="basket-value">{{ basket.join(', ') || '(empty)' }}</span></template>
+    </Readout>
   </section>
 
   <section>
     <h3>Remote</h3>
-    <el-select
-      v-model="book"
-      filterable
-      remote
-      :remote-method="searchBooks"
-      :loading="loadingBooks"
-      placeholder="Search a book"
-      aria-label="Book"
-      style="width: 240px"
-    >
-      <el-option v-for="b in bookOptions" :key="b" :label="b" :value="b" />
-    </el-select>
-    <div class="out" data-testid="book-value">{{ book || '(none)' }}</div>
+    <Readout :expected="book" placeholder="Search a book" :stored-key="book">
+      <el-select
+        v-model="book"
+        filterable
+        remote
+        :remote-method="searchBooks"
+        :loading="loadingBooks"
+        placeholder="Search a book"
+        aria-label="Book"
+        style="width: 240px"
+      >
+        <el-option v-for="b in bookOptions" :key="b" :label="b" :value="b" />
+      </el-select>
+      <template #stored><span data-testid="book-value">{{ book || '(none)' }}</span></template>
+    </Readout>
   </section>
 </template>

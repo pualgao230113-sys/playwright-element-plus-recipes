@@ -32,11 +32,13 @@ test('match by title, not by role="alert"', async ({ page }) => {
 })
 
 test('the title is a level-2 heading', async ({ page }) => {
-  await expect(page.getByRole('heading', { level: 2 })).toHaveCount(1)
+  const before = await page.getByRole('heading', { level: 2 }).count()
   await page.getByRole('button', { name: 'Complete todo' }).click()
-  await expect(page.getByRole('heading', { level: 2 })).toHaveCount(2)
+  // A page-level heading query now also finds the notification title.
+  await expect(page.getByRole('heading', { level: 2 })).toHaveCount(before + 1)
+  await expect(page.getByRole('heading', { level: 2, name: 'Todo done' })).toBeVisible()
   // Scope page headings to <main> to stay clear of it.
-  await expect(page.getByRole('main').getByRole('heading', { level: 2 })).toHaveText('Notification')
+  await expect(page.getByRole('main').getByRole('heading', { level: 1 })).toHaveText('Notification')
 })
 
 test('close a sticky notification with its icon', async ({ page }) => {
@@ -44,6 +46,10 @@ test('close a sticky notification with its icon', async ({ page }) => {
   const reminder = notification(page, 'Reminder')
   await expect(reminder).toBeVisible()
   await expect(reminder.getByRole('button')).toHaveCount(0)
+  // duration: 0 never closes by itself: still there after the default 4.5 s.
+  await page.mouse.move(0, 0)
+  await page.waitForTimeout(5_000)
+  await expect(reminder).toBeVisible()
 
   await closeNotification(page, 'Reminder')
   await expect(notifications(page)).toHaveCount(0)

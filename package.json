@@ -14,24 +14,25 @@
     "url": "https://github.com/pualgao230113-sys/playwright-element-plus-recipes/issues"
   },
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "exports": {
     ".": {
       "import": {
-        "types": "./dist-helpers/esm/element-plus.d.ts",
-        "default": "./dist-helpers/esm/element-plus.js"
+        "types": "./packages/playwright-element-plus/dist/esm/index.d.ts",
+        "default": "./packages/playwright-element-plus/dist/esm/index.js"
       },
       "require": {
-        "types": "./dist-helpers/cjs/element-plus.d.ts",
-        "default": "./dist-helpers/cjs/element-plus.js"
+        "types": "./packages/playwright-element-plus/dist/cjs/index.d.ts",
+        "default": "./packages/playwright-element-plus/dist/cjs/index.js"
       }
     }
   },
-  "main": "./dist-helpers/cjs/element-plus.js",
-  "types": "./dist-helpers/esm/element-plus.d.ts",
+  "main": "./packages/playwright-element-plus/dist/cjs/index.js",
+  "types": "./packages/playwright-element-plus/dist/cjs/index.d.ts",
   "files": [
-    "dist-helpers",
-    "tests/helpers",
-    "docs/helpers.md"
+    "packages/playwright-element-plus/dist"
   ],
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
@@ -39,8 +40,8 @@
   "scripts": {
     "dev": "vite --port 5179 --strictPort",
     "build": "vite build",
-    "build:helpers": "node scripts/build-helpers.mjs",
-    "prepare": "node scripts/build-helpers.mjs",
+    "build:helpers": "npm run build -w playwright-element-plus",
+    "prepare": "npm run build -w playwright-element-plus",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "test": "playwright test",
     "test:ui": "playwright test --ui"
@@ -49,6 +50,7 @@
     "@playwright/test": ">=1.50.0"
   },
   "devDependencies": {
+    "@fontsource-variable/recursive": "^5.3.0",
     "@playwright/test": "^1.63.0",
     "@types/node": "^24.0.0",
     "@vitejs/plugin-vue": "^6.0.9",

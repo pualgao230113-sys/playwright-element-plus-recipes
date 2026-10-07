@@ -8,7 +8,7 @@ Element Plus のコンポーネントには、Playwright のテストをわか�
 
 <p align="center"><img src="docs/demo.gif" alt="Playwright がデモアプリを操作している様子: select から選ぶ、トーストを積み重ねる、日付を選ぶ" width="720"></p>
 
-ライブデモ: <https://pualgao230113-sys.github.io/playwright-element-plus-recipes/>（まだ公開していません。リポジトリを public にして GitHub Pages を有効にしたら公開されます）。
+ライブデモ: <https://pualgao230113-sys.github.io/playwright-element-plus-recipes/>
 
 Element Plus および Playwright とは無関係です。名前は、このプロジェクトが何をテストしているかを説明するためだけに使っています。
 
@@ -17,7 +17,7 @@ Element Plus および Playwright とは無関係です。名前は、このプ�
 ```bash
 git clone https://github.com/pualgao230113-sys/playwright-element-plus-recipes.git
 cd playwright-element-plus-recipes
-npm install
+npm ci
 npx playwright install chromium   # first time only
 npm test                          # starts the demo app on :5179 and runs every recipe
 ```
@@ -26,33 +26,22 @@ npm test                          # starts the demo app on :5179 and runs every 
 |---|---|
 | `npm run dev` | デモアプリ（<http://localhost:5179>）、レシピごとに 1 ページ |
 | `npm test` | Playwright のフルスイート（headless Chromium、worker 1 つ） |
-| `npm run test:ui` | Playwright の UI モード。1 つのレシピをステップ実行するのに便利 |
+| `npm run test:ui` | Playwright の UI モード。1 つのレシピをステップ実行するときに使う |
 | `npm run typecheck` | アプリ、spec、ヘルパーを型チェックする |
 | `npm run build` | デモアプリを `dist/` にビルドする |
-| `npm run build:helpers` | ヘルパーを `dist-helpers/` にビルドする |
+| `npm run build:helpers` | `playwright-element-plus` パッケージを `packages/playwright-element-plus/dist/` にビルドする |
 
 ## 自分のプロジェクトでヘルパーを使う
 
-GitHub からインストールします。npm には公開していません。
-
 ```bash
-npm i -D github:pualgao230113-sys/playwright-element-plus-recipes
+npm i -D playwright-element-plus
 ```
 
-インストール時に npm がヘルパーをビルドする（パッケージの `prepare` スクリプト）ので、初回のインストールには 1 分ほどかかります。プロジェクトには `@playwright/test` が先に入っている必要があります。peer dependency で、1.63 でテストしています。
-
-pnpm は依存パッケージのビルドスクリプトをブロックするので、先に `pnpm-workspace.yaml` でこのパッケージを許可してください。pnpm 11 の場合:
-
-```yaml
-allowBuilds:
-  playwright-element-plus-recipes: true
-```
-
-pnpm 10 の場合は、pnpm が `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` エラーで表示するエントリを `onlyBuiltDependencies` に追加します。git 依存ではエントリにコミットが含まれるので、更新するたびに変わります。
+プロジェクトには `@playwright/test` が先に入っている必要があります。peer dependency で、1.63 でテストしています。
 
 ```ts
 import { expect, test } from '@playwright/test'
-import { drainMessages, message, selectOption } from 'playwright-element-plus-recipes'
+import { drainMessages, message, selectOption } from 'playwright-element-plus'
 
 test('save a fruit', async ({ page }) => {
   await page.goto('/fruits')
@@ -63,7 +52,24 @@ test('save a fruit', async ({ page }) => {
 })
 ```
 
-ESM と CommonJS のどちらのテストプロジェクトからでも使えて、型も付いてきます。すべてのヘルパーは例付きで [docs/helpers.md](docs/helpers.md) に載っています。依存を増やしたくない場合は、[`tests/helpers/element-plus.ts`](tests/helpers/element-plus.ts) を自分のプロジェクトにコピーしてください。import しているのは `@playwright/test` だけです。
+ESM と CommonJS のどちらのテストプロジェクトからでも使えて、型も付いてきます。すべてのヘルパーは例付きで [docs/helpers.md](docs/helpers.md) に載っています。パッケージ自体の README は [packages/playwright-element-plus/README.md](packages/playwright-element-plus/README.md) です。依存を増やしたくない場合は、[`packages/playwright-element-plus/src/index.ts`](packages/playwright-element-plus/src/index.ts) を自分のプロジェクトにコピーしてください。import しているのは `@playwright/test` だけです。
+
+### 代わりに GitHub からインストールする
+
+```bash
+npm i -D github:pualgao230113-sys/playwright-element-plus-recipes
+```
+
+この方法ではリポジトリが `playwright-element-plus-recipes` という名前でインストールされるので、import 元も `'playwright-element-plus-recipes'` にしてください。インストール時に npm がヘルパーをビルドする（リポジトリの `prepare` スクリプト）ので、初回のインストールには 1 分ほどかかります。
+
+pnpm は依存パッケージのビルドスクリプトをブロックするので、先に `pnpm-workspace.yaml` でこのパッケージを許可してください。pnpm 11 の場合:
+
+```yaml
+allowBuilds:
+  playwright-element-plus-recipes: true
+```
+
+pnpm 10 の場合は、pnpm が `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` エラーで表示するエントリを `onlyBuiltDependencies` に追加します。git 依存ではエントリにコミットが含まれるので、更新するたびに変わります。
 
 ## レシピ
 
@@ -99,15 +105,15 @@ ESM と CommonJS のどちらのテストプロジェクトからでも使えて
 
 Vue 3.5.43、@playwright/test 1.63.0（Chromium headless shell）、Vite 8.3.3、Node.js 24。
 
-下の各 Element Plus バージョンを個別にインストールし、それぞれでスイート全体（109 テスト）を実行しました。バージョン間で挙動が変わった箇所では、spec は理由にバージョンを書いてスキップするか、バージョンごとに正しい値をアサートします。CI ではサポート対象の 3 バージョンを実行しています。
+下の各 Element Plus バージョンを個別にインストールし、それぞれでスイート全体（111 テスト）を実行しました。バージョン間で挙動が変わった箇所では、spec は理由にバージョンを書いてスキップするか、バージョンごとに正しい値をアサートします。CI ではサポート対象の 3 バージョンを実行しています。
 
 | Element Plus | 結果 | メモ |
 |---|---|---|
-| 2.14.7 | 109 件成功 | 執筆時点の最新版。すべてのレシピが当てはまる。 |
-| 2.13.7 | 107 件成功、2 件スキップ | 緩い日付解析はまだない（04）。input のカウンターに `role="status"` がない（08）。 |
-| 2.9.11 | 102 件成功、7 件スキップ | 上記に加えて、テーブルに "Sort by" ボタンと `aria-sort` がない（06）。autocomplete の `aria-controls` が listbox を指していない（12）。 |
-| 2.7.8 | 非対応: 10 件失敗 | 日付・時刻ピッカーの input に `combobox` role がないので、ヘルパーが何も見つけられない。 |
-| 2.4.4 | 非対応: 16 件失敗 | 2.7.8 と同じ問題に加えて、select、checkbox / radio、dialog、tree-select で 6 件失敗する（例：select の placeholder が input へのクリックを遮らない）。 |
+| 2.14.7 | 111 件成功 | すべてのレシピが当てはまる。 |
+| 2.13.7 | 109 件成功、2 件スキップ | 緩い日付解析はまだない（04）。input のカウンターに `role="status"` がない（08）。 |
+| 2.9.11 | 104 件成功、7 件スキップ | 上記に加えて、テーブルに "Sort by" ボタンと `aria-sort` がない（06）。autocomplete の `aria-controls` が listbox を指していない（12）。 |
+| 2.7.8 | 非対応: 13 件失敗、7 件スキップ | 日付・時刻ピッカーの input に `combobox` role がないので、ヘルパーが何も見つけられない。また、filterable な select の placeholder がまだ input へのクリックを遮る（01）。外側をクリックしても popconfirm が閉じない（19）。 |
+| 2.4.4 | 非対応: 19 件失敗、7 件スキップ | 2.7.8 と同じ日付ピッカー、時刻ピッカー、popconfirm の失敗に加えて、select、checkbox / radio、dialog、tree-select、pagination でさらに 7 件失敗する（例えば、select の placeholder が input へのクリックをまったく遮らない）。 |
 
 それぞれの変更がどのバージョンで入ったかの一覧です。自分のバージョンにどのメモが当てはまるかを判断するのに使ってください。
 
@@ -140,4 +146,4 @@ Vue 3.5.43、@playwright/test 1.63.0（Chromium headless shell）、Vite 8.3.3�
 
 ## 翻訳について
 
-英語以外の README は機械翻訳の助けを借りて作っています。基準は英語の README です。修正は pull request で歓迎します。
+基準は英語の README です。翻訳の修正は pull request で歓迎します。

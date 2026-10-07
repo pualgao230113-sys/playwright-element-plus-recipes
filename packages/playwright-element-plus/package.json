@@ -1,0 +1,64 @@
+{
+  "name": "playwright-element-plus",
+  "version": "0.1.0",
+  "description": "Playwright helpers for testing Vue apps built with Element Plus: selects, date pickers, tables, toasts, uploads and more, without the usual timing and locator traps.",
+  "keywords": [
+    "playwright",
+    "element-plus",
+    "vue",
+    "vue3",
+    "testing",
+    "e2e"
+  ],
+  "license": "MIT",
+  "author": "Paul Gao",
+  "homepage": "https://github.com/pualgao230113-sys/playwright-element-plus-recipes/tree/main/packages/playwright-element-plus#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pualgao230113-sys/playwright-element-plus-recipes.git",
+    "directory": "packages/playwright-element-plus"
+  },
+  "bugs": {
+    "url": "https://github.com/pualgao230113-sys/playwright-element-plus-recipes/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/cjs/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "prepack": "node scripts/build.mjs"
+  },
+  "peerDependencies": {
+    "@playwright/test": ">=1.50.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

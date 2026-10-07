@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { narrow } from '../narrow'
 import { ref } from 'vue'
 
 const agree = ref(false)
@@ -10,12 +11,10 @@ const darkMode = ref(false)
 </script>
 
 <template>
-  <h2>Checkbox / Radio / Switch</h2>
-
   <section>
     <h3>Checkbox</h3>
     <el-checkbox v-model="agree">I agree to the terms</el-checkbox>
-    <div class="out" data-testid="agree-value">{{ agree }}</div>
+    <div class="out">v-model: <span data-testid="agree-value">{{ agree }}</span></div>
   </section>
 
   <section>
@@ -25,7 +24,7 @@ const darkMode = ref(false)
       <el-checkbox value="Olives">Olives</el-checkbox>
       <el-checkbox value="Basil">Basil</el-checkbox>
     </el-checkbox-group>
-    <div class="out" data-testid="toppings-value">{{ toppings.join(', ') }}</div>
+    <div class="out">v-model: <span data-testid="toppings-value">{{ toppings.join(', ') }}</span></div>
   </section>
 
   <section>
@@ -35,7 +34,7 @@ const darkMode = ref(false)
       <el-radio value="Medium">Medium</el-radio>
       <el-radio value="Large">Large</el-radio>
     </el-radio-group>
-    <div class="out" data-testid="size-value">{{ size }}</div>
+    <div class="out">v-model: <span data-testid="size-value">{{ size }}</span></div>
   </section>
 
   <section>
@@ -45,12 +44,12 @@ const darkMode = ref(false)
       <el-radio-button value="Medium">Medium</el-radio-button>
       <el-radio-button value="Large">Large</el-radio-button>
     </el-radio-group>
-    <div class="out" data-testid="size-button-value">{{ sizeButton }}</div>
+    <div class="out">v-model: <span data-testid="size-button-value">{{ sizeButton }}</span></div>
   </section>
 
   <section>
     <h3>Switch</h3>
-    <el-form label-width="140px">
+    <el-form label-width="140px" :label-position="narrow ? 'top' : 'right'">
       <el-form-item label="Email reminders">
         <el-switch v-model="notify" />
       </el-form-item>
@@ -58,7 +57,7 @@ const darkMode = ref(false)
         <el-switch v-model="darkMode" active-text="Dark" inactive-text="Light" />
       </el-form-item>
     </el-form>
-    <div class="out" data-testid="notify-value">{{ notify }}</div>
-    <div class="out" data-testid="dark-value">{{ darkMode }}</div>
+    <div class="out">reminders: <span data-testid="notify-value">{{ notify }}</span></div>
+    <div class="out">dark theme: <span data-testid="dark-value">{{ darkMode }}</span></div>
   </section>
 </template>

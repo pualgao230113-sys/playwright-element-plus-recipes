@@ -29,14 +29,12 @@ async function deleteBook() {
 </script>
 
 <template>
-  <h2>Dialog / Drawer / MessageBox</h2>
-
   <section>
     <el-button type="primary" @click="dialogOpen = true">Edit book</el-button>
     <el-button @click="drawerOpen = true">Show details</el-button>
     <el-button type="danger" @click="deleteBook">Delete book</el-button>
-    <div class="out" data-testid="saved-title">{{ savedTitle }}</div>
-    <div class="out" data-testid="status">{{ status }}</div>
+    <div class="out">saved title: <span data-testid="saved-title">{{ savedTitle }}</span></div>
+    <div class="out">status: <span data-testid="status">{{ status }}</span></div>
   </section>
 
   <section>

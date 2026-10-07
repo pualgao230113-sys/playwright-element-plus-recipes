@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { narrow } from '../narrow'
 import { ref } from 'vue'
+import Readout from '../components/Readout.vue'
+import { pathLabels } from '../readout'
 
 const options = [
   {
@@ -26,30 +29,42 @@ const searchable = ref<string[] | null>(null)
 const anyLevel = ref<string[] | null>(null)
 const many = ref<string[][]>([])
 const show = (v: unknown) => (v === null || (Array.isArray(v) && v.length === 0) ? '(none)' : JSON.stringify(v))
+const labels = (v: string[] | null) => (v ? pathLabels(options, v) : '')
 </script>
 
 <template>
-  <h2>Cascader</h2>
-  <el-form label-width="140px" style="max-width: 560px">
-    <el-form-item label="Produce">
-      <el-cascader v-model="basic" :options="options" placeholder="Pick produce" />
-      <div class="out" data-testid="basic-value">{{ show(basic) }}</div>
-    </el-form-item>
-    <el-form-item label="Hover produce">
-      <el-cascader v-model="hover" :options="options" :props="{ expandTrigger: 'hover' }" placeholder="Hover to expand" />
-      <div class="out" data-testid="hover-value">{{ show(hover) }}</div>
-    </el-form-item>
-    <el-form-item label="Search produce">
-      <el-cascader v-model="searchable" :options="options" filterable placeholder="Type to search" />
-      <div class="out" data-testid="search-value">{{ show(searchable) }}</div>
-    </el-form-item>
-    <el-form-item label="Any level">
-      <el-cascader v-model="anyLevel" :options="options" :props="{ checkStrictly: true }" placeholder="Pick any level" />
-      <div class="out" data-testid="any-value">{{ show(anyLevel) }}</div>
-    </el-form-item>
-    <el-form-item label="Many produce">
-      <el-cascader v-model="many" :options="options" :props="{ multiple: true }" placeholder="Pick several" />
-      <div class="out" data-testid="many-value">{{ show(many) }}</div>
-    </el-form-item>
-  </el-form>
+  <section>
+    <el-form label-width="140px" :label-position="narrow ? 'top' : 'right'">
+      <el-form-item label="Produce">
+        <Readout :expected="labels(basic)" :stored-key="basic">
+          <el-cascader v-model="basic" :options="options" placeholder="Pick produce" />
+          <template #stored><span data-testid="basic-value">{{ show(basic) }}</span></template>
+        </Readout>
+      </el-form-item>
+      <el-form-item label="Hover produce">
+        <Readout :expected="labels(hover)" :stored-key="hover">
+          <el-cascader v-model="hover" :options="options" :props="{ expandTrigger: 'hover' }" placeholder="Hover to expand" />
+          <template #stored><span data-testid="hover-value">{{ show(hover) }}</span></template>
+        </Readout>
+      </el-form-item>
+      <el-form-item label="Search produce">
+        <Readout :expected="labels(searchable)" :stored-key="searchable">
+          <el-cascader v-model="searchable" :options="options" filterable placeholder="Type to search" />
+          <template #stored><span data-testid="search-value">{{ show(searchable) }}</span></template>
+        </Readout>
+      </el-form-item>
+      <el-form-item label="Any level">
+        <Readout :expected="labels(anyLevel)" :stored-key="anyLevel">
+          <el-cascader v-model="anyLevel" :options="options" :props="{ checkStrictly: true }" placeholder="Pick any level" />
+          <template #stored><span data-testid="any-value">{{ show(anyLevel) }}</span></template>
+        </Readout>
+      </el-form-item>
+      <el-form-item label="Many produce">
+        <Readout :expected="many.map((p) => pathLabels(options, p)).join(', ')" :stored-key="many">
+          <el-cascader v-model="many" :options="options" :props="{ multiple: true }" placeholder="Pick several" />
+          <template #stored><span data-testid="many-value">{{ show(many) }}</span></template>
+        </Readout>
+      </el-form-item>
+    </el-form>
+  </section>
 </template>

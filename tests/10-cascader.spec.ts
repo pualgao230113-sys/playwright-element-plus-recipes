@@ -86,6 +86,8 @@ test('checkStrictly: click the radio to pick a parent level', async ({ page }) =
 test('filterable: results are a plain list of full paths', async ({ page }) => {
   const panel = await openCascader(page, 'Search produce')
   await page.getByRole('textbox', { name: 'Search produce' }).fill('berry')
+  // Nothing is stored until you click a result.
+  await expect(page.getByTestId('search-value')).toHaveText('(none)')
 
   await expect(panel.getByRole('menuitem')).toHaveCount(0)
   await expect(panel.getByRole('listitem')).toHaveText(['Fruit / Berries / Strawberry', 'Fruit / Berries / Blueberry'])

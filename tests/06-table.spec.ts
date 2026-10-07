@@ -15,11 +15,6 @@
  *     the "Sort by X" caret button does NOT: a plain click() hits its lower
  *     (descending) caret. Assert the header's `aria-sort` after every click.
  *     The button and `aria-sort` exist since 2.13.0.
- *
- * Note: older Element UI / early Element Plus rendered fixed columns as a
- * second, overlapping table (every fixed cell existed twice). Current
- * Element Plus uses `position: sticky` in the same table, so rows are not
- * duplicated - but code ported from those days often still has workarounds.
  */
 import { expect, test } from '@playwright/test'
 import { columnTexts, rowByCell, tableRows, waitForTable } from './helpers/element-plus'
@@ -91,7 +86,7 @@ test('sorting: click the header cell to cycle, or a caret to set', async ({ page
 
   // Clicking the header cell cycles ascending -> descending -> none. Click its
   // left edge, not the centre: depending on fonts the centre can land on the
-  // "Sort by" button, which jumps straight to descending (seen on Linux CI).
+  // "Sort by" button, which jumps straight to descending.
   const edge = async () => {
     const box = await yearHeader.boundingBox()
     await yearHeader.click({ position: { x: 4, y: box!.height / 2 } })

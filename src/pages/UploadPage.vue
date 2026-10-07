@@ -27,7 +27,6 @@ function onSuccess(_res: unknown, file: UploadFile) {
 </script>
 
 <template>
-  <h2>Upload</h2>
   <section>
     <h3>Cover image</h3>
     <el-upload

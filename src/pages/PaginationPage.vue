@@ -8,7 +8,7 @@ const visible = computed(() => fruits.slice((page.value - 1) * size.value, page.
 </script>
 
 <template>
-  <h2>Pagination</h2>
+  <section>
   <ul data-testid="fruit-list">
     <li v-for="f in visible" :key="f">{{ f }}</li>
   </ul>
@@ -20,4 +20,5 @@ const visible = computed(() => fruits.slice((page.value - 1) * size.value, page.
     layout="total, sizes, prev, pager, next, jumper"
   />
   <div class="out">page <span data-testid="page">{{ page }}</span>, size <span data-testid="size">{{ size }}</span></div>
+  </section>
 </template>

@@ -5,7 +5,6 @@ const open = ref<string[]>(['shopping'])
 </script>
 
 <template>
-  <h2>Collapse</h2>
   <section>
     <h3>Todo lists</h3>
     <el-collapse v-model="open">
@@ -13,6 +12,6 @@ const open = ref<string[]>(['shopping'])
       <el-collapse-item title="Garden" name="garden">Water the plants, cut the grass</el-collapse-item>
       <el-collapse-item title="Garden tools" name="tools">Rake, hose</el-collapse-item>
     </el-collapse>
-    <div class="out" data-testid="open-value">{{ open.join(', ') || '(none)' }}</div>
+    <div class="out">open items: <span data-testid="open-value">{{ open.join(', ') || '(none)' }}</span></div>
   </section>
 </template>

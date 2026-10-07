@@ -8,7 +8,7 @@ Element Plus components do things that break Playwright tests in confusing ways:
 
 <p align="center"><img src="docs/demo.gif" alt="Playwright driving the demo app: picking from a select, stacking toasts, choosing a date" width="720"></p>
 
-Live demo: <https://pualgao230113-sys.github.io/playwright-element-plus-recipes/> (not live yet: it goes up once the repo is public and GitHub Pages is on).
+Live demo: <https://pualgao230113-sys.github.io/playwright-element-plus-recipes/>
 
 Not affiliated with Element Plus or Playwright. The names are used only to describe what the project tests.
 
@@ -17,7 +17,7 @@ Not affiliated with Element Plus or Playwright. The names are used only to descr
 ```bash
 git clone https://github.com/pualgao230113-sys/playwright-element-plus-recipes.git
 cd playwright-element-plus-recipes
-npm install
+npm ci
 npx playwright install chromium   # first time only
 npm test                          # starts the demo app on :5179 and runs every recipe
 ```
@@ -26,33 +26,22 @@ npm test                          # starts the demo app on :5179 and runs every 
 |---|---|
 | `npm run dev` | Demo app at <http://localhost:5179>, one page per recipe |
 | `npm test` | Full Playwright suite (headless Chromium, 1 worker) |
-| `npm run test:ui` | Playwright UI mode, handy for stepping through one recipe |
+| `npm run test:ui` | Playwright UI mode, for stepping through one recipe |
 | `npm run typecheck` | Type-checks the app, the specs and the helpers |
 | `npm run build` | Builds the demo app into `dist/` |
-| `npm run build:helpers` | Builds the helpers into `dist-helpers/` |
+| `npm run build:helpers` | Builds the `playwright-element-plus` package into `packages/playwright-element-plus/dist/` |
 
 ## Use the helpers in your own project
 
-Install from GitHub. It is not on npm.
-
 ```bash
-npm i -D github:pualgao230113-sys/playwright-element-plus-recipes
+npm i -D playwright-element-plus
 ```
 
-npm builds the helpers during install (the package's `prepare` script), so the first install takes a minute. Your project needs `@playwright/test` already; it is a peer dependency, tested with 1.63.
-
-pnpm blocks build scripts of dependencies, so allow this one in `pnpm-workspace.yaml` first. With pnpm 11:
-
-```yaml
-allowBuilds:
-  playwright-element-plus-recipes: true
-```
-
-With pnpm 10, add the entry pnpm prints in its `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` error to `onlyBuiltDependencies`. For a git dependency it includes the commit, so it changes when you update.
+Your project needs `@playwright/test` already; it is a peer dependency, tested with 1.63.
 
 ```ts
 import { expect, test } from '@playwright/test'
-import { drainMessages, message, selectOption } from 'playwright-element-plus-recipes'
+import { drainMessages, message, selectOption } from 'playwright-element-plus'
 
 test('save a fruit', async ({ page }) => {
   await page.goto('/fruits')
@@ -63,7 +52,24 @@ test('save a fruit', async ({ page }) => {
 })
 ```
 
-It works from ESM and CommonJS test projects, and the types come with it. Every helper is listed with an example in [docs/helpers.md](docs/helpers.md). If you'd rather not add a dependency, copy [`tests/helpers/element-plus.ts`](tests/helpers/element-plus.ts) into your project. It only imports `@playwright/test`.
+It works from ESM and CommonJS test projects, and the types come with it. Every helper is listed with an example in [docs/helpers.md](docs/helpers.md). The package's own README is [packages/playwright-element-plus/README.md](packages/playwright-element-plus/README.md). If you'd rather not add a dependency, copy [`packages/playwright-element-plus/src/index.ts`](packages/playwright-element-plus/src/index.ts) into your project. It only imports `@playwright/test`.
+
+### Install from GitHub instead
+
+```bash
+npm i -D github:pualgao230113-sys/playwright-element-plus-recipes
+```
+
+This installs the repo under the name `playwright-element-plus-recipes`, so import from `'playwright-element-plus-recipes'` instead. npm builds the helpers during install (the repo's `prepare` script), so the first install takes a minute.
+
+pnpm blocks build scripts of dependencies, so allow this one in `pnpm-workspace.yaml` first. With pnpm 11:
+
+```yaml
+allowBuilds:
+  playwright-element-plus-recipes: true
+```
+
+With pnpm 10, add the entry pnpm prints in its `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` error to `onlyBuiltDependencies`. For a git dependency it includes the commit, so it changes when you update.
 
 ## Recipes
 
@@ -99,15 +105,15 @@ One thing comes up on almost every page, and it is Playwright, not Element Plus:
 
 Vue 3.5.43, @playwright/test 1.63.0 (Chromium headless shell), Vite 8.3.3, Node.js 24.
 
-Each Element Plus version below was installed on its own and the whole suite run against it (109 tests). Where a behaviour changed between versions, the spec skips with the version in the reason, or asserts the right value for each version. CI runs the three supported versions.
+Each Element Plus version below was installed on its own and the whole suite run against it (111 tests). Where a behaviour changed between versions, the spec skips with the version in the reason, or asserts the right value for each version. CI runs the three supported versions.
 
 | Element Plus | Result | Notes |
 |---|---|---|
-| 2.14.7 | 109 passed | Latest at the time of writing. All recipes apply. |
-| 2.13.7 | 107 passed, 2 skipped | No lenient date parsing yet (04), no `role="status"` on the input counter (08). |
-| 2.9.11 | 102 passed, 7 skipped | Also: no "Sort by" button or `aria-sort` in tables (06), and the autocomplete's `aria-controls` doesn't point at its listbox (12). |
-| 2.7.8 | Not supported: 10 failed | Date and time picker inputs have no `combobox` role, so their helpers find nothing. |
-| 2.4.4 | Not supported: 16 failed | Same as 2.7.8, plus 6 more failures in select, checkbox / radio, dialog and tree-select (for example, the select's placeholder doesn't block clicks on the input). |
+| 2.14.7 | 111 passed | All recipes apply. |
+| 2.13.7 | 109 passed, 2 skipped | No lenient date parsing yet (04), no `role="status"` on the input counter (08). |
+| 2.9.11 | 104 passed, 7 skipped | Also: no "Sort by" button or `aria-sort` in tables (06), and the autocomplete's `aria-controls` doesn't point at its listbox (12). |
+| 2.7.8 | Not supported: 13 failed, 7 skipped | Date and time picker inputs have no `combobox` role, so their helpers find nothing. Also, a filterable select's placeholder still blocks clicks on its input (01), and a click outside does not close a popconfirm (19). |
+| 2.4.4 | Not supported: 19 failed, 7 skipped | The same date picker, time picker and popconfirm failures as 2.7.8, plus 7 more in select, checkbox / radio, dialog, tree-select and pagination (for example, the select's placeholder doesn't block clicks on its input at all). |
 
 Where each change happened, so you can tell which notes apply to your version:
 
@@ -140,4 +146,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). The main rule: a pitfall goes in only if
 
 ## Translations
 
-The non-English READMEs are machine-assisted. The English README is the reference. Fixes are welcome as pull requests.
+The English README is the reference. Fixes to translations are welcome as pull requests.
