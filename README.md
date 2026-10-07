@@ -2,9 +2,9 @@
 
 **English** | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | [Bahasa Melayu](README.ms.md) | [हिन्दी](README.hi.md)
 
-[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/)
+[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/) [![npm](https://img.shields.io/npm/v/playwright-element-plus)](https://www.npmjs.com/package/playwright-element-plus)
 
-Element Plus components do things that break Playwright tests in confusing ways: dropdowns rendered somewhere else in the page, hidden inputs, toasts that stack, values that only commit on blur. This repo has a small demo app with one page per component, a Playwright spec for each that shows the problem happening, and a helper file you can use in your own tests.
+Element Plus components do things that break Playwright tests in confusing ways: dropdowns rendered somewhere else in the page, hidden inputs, toasts that stack, values that only commit on blur. This repo has a small demo app with one page per component, a Playwright spec for each that shows the problem happening, and the helpers, published on npm as [`playwright-element-plus`](https://www.npmjs.com/package/playwright-element-plus), for your own tests.
 
 <p align="center"><img src="docs/demo.gif" alt="Playwright driving the demo app: picking from a select, stacking toasts, choosing a date" width="720"></p>
 
@@ -54,7 +54,9 @@ test('save a fruit', async ({ page }) => {
 
 It works from ESM and CommonJS test projects, and the types come with it. Every helper is listed with an example in [docs/helpers.md](docs/helpers.md). The package's own README is [packages/playwright-element-plus/README.md](packages/playwright-element-plus/README.md). If you'd rather not add a dependency, copy [`packages/playwright-element-plus/src/index.ts`](packages/playwright-element-plus/src/index.ts) into your project. It only imports `@playwright/test`.
 
-### Install from GitHub instead
+### Install the latest from GitHub
+
+Only needed for changes that are on `main` but not released to npm yet.
 
 ```bash
 npm i -D github:pualgao230113-sys/playwright-element-plus-recipes

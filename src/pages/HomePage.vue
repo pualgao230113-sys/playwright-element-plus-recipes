@@ -12,8 +12,12 @@ const groups = families.map((family) => ({ family, items: recipes.filter((r) => 
       Each page has the Element Plus components the tests use. Follow the steps to see the problem yourself, then open
       the spec to see how the test handles it.
     </p>
+    <p class="home__install">
+      Use the same helpers in your own tests: <code>npm i -D playwright-element-plus</code>
+    </p>
     <p class="head-links">
       <a :href="REPO_URL" target="_blank" rel="noopener">Repository on GitHub</a>
+      <a href="https://www.npmjs.com/package/playwright-element-plus" target="_blank" rel="noopener">Package on npm</a>
       <a :href="README_URL" target="_blank" rel="noopener">README: the pitfalls in one table</a>
     </p>
     <p class="home__legend">
@@ -42,6 +46,19 @@ const groups = families.map((family) => ({ family, items: recipes.filter((r) => 
 <style>
 .home {
   font-family: var(--sans);
+}
+.home__install {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+.home__install code {
+  font-family: var(--mono);
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 2px 8px;
+  white-space: nowrap;
 }
 .home__intro {
   margin: 0 0 12px;

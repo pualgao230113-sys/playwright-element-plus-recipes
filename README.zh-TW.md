@@ -2,9 +2,9 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md) | **繁體中文** | [日本語](README.ja.md) | [한국어](README.ko.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | [Bahasa Melayu](README.ms.md) | [हिन्दी](README.hi.md)
 
-[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/)
+[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/) [![npm](https://img.shields.io/npm/v/playwright-element-plus)](https://www.npmjs.com/package/playwright-element-plus)
 
-Element Plus 元件有些行為會讓 Playwright 測試壞得莫名其妙：下拉選單渲染在頁面的別處、input 是隱藏的、訊息提示會堆疊、值要等失焦才送出。這個 repo 裡有一個小示範應用程式，每個元件一個頁面；每個元件配一個 Playwright spec，把問題實際重現出來；還有一個 helper 檔案，你可以直接用在自己的測試裡。
+Element Plus 元件有些行為會讓 Playwright 測試壞得莫名其妙：下拉選單渲染在頁面的別處、input 是隱藏的、訊息提示會堆疊、值要等失焦才送出。這個 repo 裡有一個小示範應用程式，每個元件一個頁面；每個元件配一個 Playwright spec，把問題實際重現出來；這些 helper 已經發布到 npm，套件名稱 [`playwright-element-plus`](https://www.npmjs.com/package/playwright-element-plus)，可以直接裝進自己的專案用。
 
 <p align="center"><img src="docs/demo.gif" alt="Playwright 操作示範應用程式：從下拉選單選值、堆疊的訊息提示、選擇日期" width="720"></p>
 
@@ -54,7 +54,9 @@ test('save a fruit', async ({ page }) => {
 
 ESM 和 CommonJS 的測試專案都能用，型別定義也一起附上了。每個 helper 都在 [docs/helpers.md](docs/helpers.md) 裡列出並附有範例。這個套件自己的 README 在 [packages/playwright-element-plus/README.md](packages/playwright-element-plus/README.md)。如果你不想多加一個相依套件，就把 [`packages/playwright-element-plus/src/index.ts`](packages/playwright-element-plus/src/index.ts) 複製到你的專案裡。它只 import 了 `@playwright/test`。
 
-### 改從 GitHub 安裝
+### 從 GitHub 安裝最新程式碼
+
+只有想用已經合進 `main`、但還沒發布到 npm 的改動時才需要。
 
 ```bash
 npm i -D github:pualgao230113-sys/playwright-element-plus-recipes

@@ -2,9 +2,9 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | **日本語** | [한국어](README.ko.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | [Bahasa Melayu](README.ms.md) | [हिन्दी](README.hi.md)
 
-[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/)
+[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/) [![npm](https://img.shields.io/npm/v/playwright-element-plus)](https://www.npmjs.com/package/playwright-element-plus)
 
-Element Plus のコンポーネントには、Playwright のテストをわかりにくい形で壊す挙動があります。ドロップダウンがページの別の場所に描画される、input が隠れている、トーストが積み重なる、値が blur したときにしか確定しない、などです。このリポジトリには、コンポーネントごとに 1 ページの小さなデモアプリと、その問題が実際に起きることを示すコンポーネントごとの Playwright の spec、それに自分のテストで使えるヘルパーファイルが入っています。
+Element Plus のコンポーネントには、Playwright のテストをわかりにくい形で壊す挙動があります。ドロップダウンがページの別の場所に描画される、input が隠れている、トーストが積み重なる、値が blur したときにしか確定しない、などです。このリポジトリには、コンポーネントごとに 1 ページの小さなデモアプリと、その問題が実際に起きることを示すコンポーネントごとの Playwright の spec、それに自分のテストで使えるヘルパーが入っています。ヘルパーは npm で [`playwright-element-plus`](https://www.npmjs.com/package/playwright-element-plus) として公開しています。
 
 <p align="center"><img src="docs/demo.gif" alt="Playwright がデモアプリを操作している様子: select から選ぶ、トーストを積み重ねる、日付を選ぶ" width="720"></p>
 
@@ -54,7 +54,9 @@ test('save a fruit', async ({ page }) => {
 
 ESM と CommonJS のどちらのテストプロジェクトからでも使えて、型も付いてきます。すべてのヘルパーは例付きで [docs/helpers.md](docs/helpers.md) に載っています。パッケージ自体の README は [packages/playwright-element-plus/README.md](packages/playwright-element-plus/README.md) です。依存を増やしたくない場合は、[`packages/playwright-element-plus/src/index.ts`](packages/playwright-element-plus/src/index.ts) を自分のプロジェクトにコピーしてください。import しているのは `@playwright/test` だけです。
 
-### 代わりに GitHub からインストールする
+### GitHub から最新版をインストールする
+
+`main` に入っていて、まだ npm に出ていない変更を使いたいときだけ必要です。
 
 ```bash
 npm i -D github:pualgao230113-sys/playwright-element-plus-recipes

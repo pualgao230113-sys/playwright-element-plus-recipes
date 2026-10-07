@@ -2,9 +2,9 @@
 
 [English](README.md) | **简体中文** | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | [Bahasa Melayu](README.ms.md) | [हिन्दी](README.hi.md)
 
-[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/)
+[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/) [![npm](https://img.shields.io/npm/v/playwright-element-plus)](https://www.npmjs.com/package/playwright-element-plus)
 
-Element Plus 组件有些行为会让 Playwright 测试挂得莫名其妙：下拉框渲染在页面的别处、input 是隐藏的、消息提示会叠加、值要等失焦才提交。这个仓库里有一个小演示应用，每个组件一个页面；每个组件配一个 Playwright spec，把问题实际复现出来；还有一个 helper 文件，你可以直接用在自己的测试里。
+Element Plus 组件有些行为会让 Playwright 测试挂得莫名其妙：下拉框渲染在页面的别处、input 是隐藏的、消息提示会叠加、值要等失焦才提交。这个仓库里有一个小演示应用，每个组件一个页面；每个组件配一个 Playwright spec，把问题实际复现出来；这些 helper 已经发布到 npm，包名 [`playwright-element-plus`](https://www.npmjs.com/package/playwright-element-plus)，可以直接装进自己的项目用。
 
 <p align="center"><img src="docs/demo.gif" alt="Playwright 操作演示应用：从下拉框里选值、叠加的消息提示、选择日期" width="720"></p>
 
@@ -54,7 +54,9 @@ test('save a fruit', async ({ page }) => {
 
 ESM 和 CommonJS 的测试项目都能用，类型定义也一起带上了。每个 helper 都在 [docs/helpers.md](docs/helpers.md) 里列出并附有示例。这个包自己的 README 在 [packages/playwright-element-plus/README.md](packages/playwright-element-plus/README.md)。如果你不想多加一个依赖，就把 [`packages/playwright-element-plus/src/index.ts`](packages/playwright-element-plus/src/index.ts) 复制到你的项目里。它只 import 了 `@playwright/test`。
 
-### 改从 GitHub 安装
+### 从 GitHub 安装最新代码
+
+只有想用已经合进 `main`、但还没发布到 npm 的改动时才需要。
 
 ```bash
 npm i -D github:pualgao230113-sys/playwright-element-plus-recipes

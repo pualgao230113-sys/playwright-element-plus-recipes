@@ -2,9 +2,9 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Tiếng Việt](README.vi.md) | **Bahasa Indonesia** | [Bahasa Melayu](README.ms.md) | [हिन्दी](README.hi.md)
 
-[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/)
+[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/) [![npm](https://img.shields.io/npm/v/playwright-element-plus)](https://www.npmjs.com/package/playwright-element-plus)
 
-Komponen Element Plus melakukan hal-hal yang membuat tes Playwright rusak dengan cara yang membingungkan: dropdown di-render di tempat lain di halaman, input tersembunyi, toast yang menumpuk, nilai yang baru tersimpan saat blur. Repo ini berisi aplikasi demo kecil dengan satu halaman per komponen, satu spec Playwright untuk tiap komponen yang memperlihatkan masalahnya terjadi, dan satu file helper yang bisa Anda pakai di tes Anda sendiri.
+Komponen Element Plus melakukan hal-hal yang membuat tes Playwright rusak dengan cara yang membingungkan: dropdown di-render di tempat lain di halaman, input tersembunyi, toast yang menumpuk, nilai yang baru tersimpan saat blur. Repo ini berisi aplikasi demo kecil dengan satu halaman per komponen, satu spec Playwright untuk tiap komponen yang memperlihatkan masalahnya terjadi, dan helper yang bisa Anda pakai di tes Anda sendiri, tersedia di npm sebagai [`playwright-element-plus`](https://www.npmjs.com/package/playwright-element-plus).
 
 <p align="center"><img src="docs/demo.gif" alt="Playwright menjalankan aplikasi demo: memilih dari select, toast yang menumpuk, memilih tanggal" width="720"></p>
 
@@ -54,7 +54,9 @@ test('save a fruit', async ({ page }) => {
 
 Paket ini bisa dipakai dari proyek tes ESM maupun CommonJS, dan tipenya sudah disertakan. Semua helper tercantum beserta contohnya di [docs/helpers.md](docs/helpers.md). README milik paket ini ada di [packages/playwright-element-plus/README.md](packages/playwright-element-plus/README.md). Jika tidak ingin menambah dependency, salin [`packages/playwright-element-plus/src/index.ts`](packages/playwright-element-plus/src/index.ts) ke proyek Anda. File itu hanya meng-import `@playwright/test`.
 
-### Instal dari GitHub sebagai gantinya
+### Instal versi terbaru dari GitHub
+
+Hanya perlu jika Anda ingin memakai perubahan yang sudah ada di `main` tetapi belum dirilis ke npm.
 
 ```bash
 npm i -D github:pualgao230113-sys/playwright-element-plus-recipes

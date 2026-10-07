@@ -2,9 +2,9 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | **한국어** | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | [Bahasa Melayu](README.ms.md) | [हिन्दी](README.hi.md)
 
-[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/)
+[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/) [![npm](https://img.shields.io/npm/v/playwright-element-plus)](https://www.npmjs.com/package/playwright-element-plus)
 
-Element Plus 컴포넌트에는 Playwright 테스트를 헷갈리는 방식으로 깨뜨리는 동작이 있습니다. 드롭다운이 페이지의 다른 곳에 렌더링되고, input이 숨겨져 있고, 토스트가 쌓이고, 값이 blur 때만 반영되는 식입니다. 이 저장소에는 컴포넌트마다 페이지가 하나씩 있는 작은 데모 앱, 컴포넌트마다 그 문제가 실제로 일어나는 걸 보여 주는 Playwright spec, 그리고 여러분의 테스트에서 쓸 수 있는 헬퍼 파일이 들어 있습니다.
+Element Plus 컴포넌트에는 Playwright 테스트를 헷갈리는 방식으로 깨뜨리는 동작이 있습니다. 드롭다운이 페이지의 다른 곳에 렌더링되고, input이 숨겨져 있고, 토스트가 쌓이고, 값이 blur 때만 반영되는 식입니다. 이 저장소에는 컴포넌트마다 페이지가 하나씩 있는 작은 데모 앱, 컴포넌트마다 그 문제가 실제로 일어나는 걸 보여 주는 Playwright spec, 그리고 여러분의 테스트에서 쓸 수 있는 헬퍼가 들어 있습니다. 헬퍼는 npm에 [`playwright-element-plus`](https://www.npmjs.com/package/playwright-element-plus)로 공개되어 있습니다.
 
 <p align="center"><img src="docs/demo.gif" alt="데모 앱을 조작하는 Playwright: select에서 고르기, 토스트 쌓기, 날짜 고르기" width="720"></p>
 
@@ -54,7 +54,9 @@ test('save a fruit', async ({ page }) => {
 
 ESM과 CommonJS 테스트 프로젝트 둘 다에서 쓸 수 있고, 타입도 함께 들어 있습니다. 모든 헬퍼는 [docs/helpers.md](docs/helpers.md)에 예제와 함께 정리돼 있습니다. 패키지 자체의 README는 [packages/playwright-element-plus/README.md](packages/playwright-element-plus/README.md)입니다. 의존성을 추가하고 싶지 않다면 [`packages/playwright-element-plus/src/index.ts`](packages/playwright-element-plus/src/index.ts)를 프로젝트에 복사하세요. 이 파일은 `@playwright/test`만 import합니다.
 
-### 대신 GitHub에서 설치하기
+### GitHub에서 최신 코드 설치하기
+
+`main`에는 들어갔지만 아직 npm에 배포되지 않은 변경을 쓰고 싶을 때만 필요합니다.
 
 ```bash
 npm i -D github:pualgao230113-sys/playwright-element-plus-recipes

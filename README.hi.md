@@ -2,9 +2,9 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | [Bahasa Melayu](README.ms.md) | **हिन्दी**
 
-[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/)
+[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/) [![npm](https://img.shields.io/npm/v/playwright-element-plus)](https://www.npmjs.com/package/playwright-element-plus)
 
-Element Plus components कुछ ऐसी चीज़ें करते हैं जिनसे Playwright tests उलझाने वाले तरीक़ों से टूटते हैं: dropdowns page में कहीं और render होते हैं, inputs छिपे रहते हैं, toasts एक के ऊपर एक जमा होते हैं, values सिर्फ़ blur पर commit होती हैं। इस repo में एक छोटा demo app है जिसमें हर component का एक page है, हर component के लिए एक Playwright spec है जो problem को होते हुए दिखाता है, और एक helper file है जिसे आप अपने tests में इस्तेमाल कर सकते हैं।
+Element Plus components कुछ ऐसी चीज़ें करते हैं जिनसे Playwright tests उलझाने वाले तरीक़ों से टूटते हैं: dropdowns page में कहीं और render होते हैं, inputs छिपे रहते हैं, toasts एक के ऊपर एक जमा होते हैं, values सिर्फ़ blur पर commit होती हैं। इस repo में एक छोटा demo app है जिसमें हर component का एक page है, हर component के लिए एक Playwright spec है जो problem को होते हुए दिखाता है, और helpers हैं जिन्हें आप अपने tests में इस्तेमाल कर सकते हैं; ये npm पर [`playwright-element-plus`](https://www.npmjs.com/package/playwright-element-plus) नाम से उपलब्ध हैं।
 
 <p align="center"><img src="docs/demo.gif" alt="Playwright demo app चला रहा है: select से option चुनना, toasts का जमा होना, date चुनना" width="720"></p>
 
@@ -54,7 +54,9 @@ test('save a fruit', async ({ page }) => {
 
 यह ESM और CommonJS दोनों तरह के test projects में चलता है, और types साथ में आते हैं। हर helper एक example के साथ [docs/helpers.md](docs/helpers.md) में दिया गया है। Package का अपना README [packages/playwright-element-plus/README.md](packages/playwright-element-plus/README.md) है। अगर आप dependency नहीं जोड़ना चाहते, तो [`packages/playwright-element-plus/src/index.ts`](packages/playwright-element-plus/src/index.ts) को अपने project में copy कर लें। यह सिर्फ़ `@playwright/test` import करता है।
 
-### इसकी जगह GitHub से install करें
+### GitHub से latest install करें
+
+सिर्फ़ तब ज़रूरी है जब आप वे बदलाव इस्तेमाल करना चाहें जो `main` में हैं पर अभी npm पर release नहीं हुए।
 
 ```bash
 npm i -D github:pualgao230113-sys/playwright-element-plus-recipes

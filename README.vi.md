@@ -2,9 +2,9 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | **Tiếng Việt** | [Bahasa Indonesia](README.id.md) | [Bahasa Melayu](README.ms.md) | [हिन्दी](README.hi.md)
 
-[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/)
+[![Tests](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml/badge.svg)](https://github.com/pualgao230113-sys/playwright-element-plus-recipes/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://pualgao230113-sys.github.io/playwright-element-plus-recipes/) [![npm](https://img.shields.io/npm/v/playwright-element-plus)](https://www.npmjs.com/package/playwright-element-plus)
 
-Các component của Element Plus có những hành vi làm test Playwright hỏng theo cách khó hiểu: dropdown được render ở chỗ khác trong trang, input bị ẩn, toast chồng lên nhau, giá trị chỉ được ghi nhận khi blur. Repo này có một ứng dụng demo nhỏ, mỗi component một trang, mỗi component có một spec Playwright cho thấy vấn đề xảy ra, và một file helper bạn có thể dùng trong test của mình.
+Các component của Element Plus có những hành vi làm test Playwright hỏng theo cách khó hiểu: dropdown được render ở chỗ khác trong trang, input bị ẩn, toast chồng lên nhau, giá trị chỉ được ghi nhận khi blur. Repo này có một ứng dụng demo nhỏ, mỗi component một trang, mỗi component có một spec Playwright cho thấy vấn đề xảy ra, và các helper bạn có thể dùng trong test của mình, có sẵn trên npm với tên [`playwright-element-plus`](https://www.npmjs.com/package/playwright-element-plus).
 
 <p align="center"><img src="docs/demo.gif" alt="Playwright điều khiển ứng dụng demo: chọn từ một select, các toast chồng lên nhau, chọn một ngày" width="720"></p>
 
@@ -54,7 +54,9 @@ test('save a fruit', async ({ page }) => {
 
 Package dùng được từ cả project test ESM lẫn CommonJS, và có kèm sẵn type. Mọi helper đều được liệt kê kèm ví dụ trong [docs/helpers.md](docs/helpers.md). README riêng của package nằm ở [packages/playwright-element-plus/README.md](packages/playwright-element-plus/README.md). Nếu không muốn thêm dependency, hãy chép [`packages/playwright-element-plus/src/index.ts`](packages/playwright-element-plus/src/index.ts) vào dự án của bạn. File này chỉ import `@playwright/test`.
 
-### Hoặc cài từ GitHub
+### Cài bản mới nhất từ GitHub
+
+Chỉ cần khi bạn muốn dùng thay đổi đã có trên `main` nhưng chưa phát hành lên npm.
 
 ```bash
 npm i -D github:pualgao230113-sys/playwright-element-plus-recipes
