@@ -1,6 +1,6 @@
 {
   "name": "playwright-element-plus",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Playwright helpers for testing Vue apps built with Element Plus: selects, date pickers, tables, toasts, uploads and more, without the usual timing and locator traps.",
   "keywords": [
     "playwright",

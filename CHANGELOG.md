@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1 - 2026-10-07
+
+- First version published to npm by the release workflow, with provenance. No code changes.
+
 ## 0.1.0 - 2026-10-07
 
 First version.
